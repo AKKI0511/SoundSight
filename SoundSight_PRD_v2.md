@@ -277,7 +277,7 @@ A settings toggle activates Senior Mode:
 
 ---
 
-## 10. Tech stack
+## 10. Tech stack (IMPORTANT: Ignore this section)
 
 ### Recommended for hackathon
 
