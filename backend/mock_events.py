@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from schemas import AlertPayload, AlertTranslation
+from schemas import AlertAnalysis, AlertPayload, AlertTranslation
 
 
 @dataclass(frozen=True)
@@ -173,3 +173,66 @@ MOCK_STREAM_PLANS: dict[str, ClipStreamPlan] = {
 
 def get_stream_plan(clip_id: str) -> ClipStreamPlan | None:
     return MOCK_STREAM_PLANS.get(clip_id)
+
+
+def normalize_alert_key(clip_id: str) -> str:
+    normalized = clip_id.lower().replace("-", "_").replace(" ", "_")
+
+    if normalized in MOCK_STREAM_PLANS:
+        return normalized
+
+    if "fire" in normalized and "alarm" in normalized:
+        return "fire_alarm"
+
+    if (
+        "emergency" in normalized
+        or "siren" in normalized
+        or "ambulance" in normalized
+    ):
+        return "emergency_vehicle"
+
+    if (
+        "attention" in normalized
+        or "getting" in normalized
+        or "baby" in normalized
+        or "cry" in normalized
+    ):
+        return "attention_outdoors"
+
+    if "door" in normalized or "knock" in normalized:
+        return "door_knock"
+
+    if (
+        "address" in normalized
+        or "indoor" in normalized
+        or "speech" in normalized
+        or "user" in normalized
+    ):
+        return "indoor_address"
+
+    return normalized
+
+
+def get_dummy_alert_payload(clip_id: str) -> AlertPayload:
+    alert_key = normalize_alert_key(clip_id)
+    plan = MOCK_STREAM_PLANS.get(alert_key) or MOCK_STREAM_PLANS["attention_outdoors"]
+    return plan.alerts[0].alert
+
+
+def analyze_candidate_window(
+    audio_window: object,
+    clip_id: str,
+    timestamp_ms: int,
+) -> AlertAnalysis:
+    del audio_window, timestamp_ms
+
+    alert = get_dummy_alert_payload(clip_id)
+    return AlertAnalysis(
+        detected_sound_type=alert.sound_type,
+        tier=alert.tier,
+        alert_text=alert.alert_text,
+        action=alert.action,
+        confidence=alert.confidence,
+        should_alert=True,
+        alert=alert,
+    )
