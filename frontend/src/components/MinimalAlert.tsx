@@ -7,10 +7,17 @@ import {
   Siren,
   type LucideIcon,
 } from "lucide-react";
-import type { DemoClip, IconKey, LanguageCode } from "@/lib/demo-alerts";
+import {
+  alertImagesByKey,
+  getLocalizedAlertCopy,
+  iconByImageKey,
+  type IconKey,
+  type LanguageCode,
+  type StreamAlert,
+} from "@/lib/demo-alerts";
 
 type MinimalAlertProps = {
-  clip: DemoClip;
+  alert: StreamAlert;
   language: LanguageCode;
 };
 
@@ -22,17 +29,19 @@ const iconMap: Record<IconKey, LucideIcon> = {
   speech: MessageCircle,
 };
 
-export function MinimalAlert({ clip, language }: MinimalAlertProps) {
-  const copy = clip.translations[language];
-  const FallbackIcon = iconMap[clip.icon];
+export function MinimalAlert({ alert, language }: MinimalAlertProps) {
+  const copy = getLocalizedAlertCopy(alert, language);
+  const image = alertImagesByKey[alert.image_key];
+  const iconKey = iconByImageKey[alert.image_key] ?? "speech";
+  const FallbackIcon = iconMap[iconKey];
 
   return (
     <div className="flex h-full flex-col items-center justify-center px-7 text-center">
       <div className="grid size-44 place-items-center rounded-[2rem] bg-white/[0.06] ring-1 ring-white/10 sm:size-52">
-        {clip.image ? (
+        {image ? (
           <Image
-            src={clip.image.src}
-            alt={clip.image.alt}
+            src={image.src}
+            alt={image.alt}
             width={220}
             height={220}
             className="h-32 w-32 object-contain drop-shadow-2xl sm:h-40 sm:w-40"

@@ -1,8 +1,8 @@
 import { MinimalAlert } from "@/components/MinimalAlert";
-import type { DemoClip, LanguageCode } from "@/lib/demo-alerts";
+import type { LanguageCode, StreamAlert } from "@/lib/demo-alerts";
 
 type PhoneEmulatorProps = {
-  alert: DemoClip | null;
+  alert: StreamAlert | null;
   language: LanguageCode;
   isPlaying: boolean;
 };
@@ -15,7 +15,7 @@ export function PhoneEmulator({ alert, language, isPlaying }: PhoneEmulatorProps
         <div className="relative flex min-h-0 flex-1 overflow-hidden bg-[#030507] lg:h-full lg:rounded-[2.35rem] lg:border lg:border-white/8">
           <div className="pointer-events-none absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-white/[0.045] to-transparent" />
           {alert ? (
-            <MinimalAlert clip={alert} language={language} />
+            <MinimalAlert alert={alert} language={language} />
           ) : (
             <div className="flex flex-1 items-center justify-center">
               <div className="flex items-center gap-3 text-sm font-medium text-slate-500">

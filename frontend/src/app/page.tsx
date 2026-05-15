@@ -1,100 +1,236 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ClipSelector } from "@/components/ClipSelector";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { PhoneEmulator } from "@/components/PhoneEmulator";
 import {
-  playableDemoClips,
+  demoClips,
+  type AlertTier,
+  type DemoClip,
   type LanguageCode,
-  type PlayableDemoClip,
+  type StreamAlert,
+  type StreamEvent,
 } from "@/lib/demo-alerts";
+import { streamDemoEvents } from "@/lib/stream-events";
+
+type ActiveAlert = {
+  eventId: string;
+  sequence: number;
+  alert: StreamAlert;
+};
+
+const tierPriority: Record<AlertTier, number> = {
+  emergency: 3,
+  social: 2,
+  ambient: 1,
+};
 
 export default function Home() {
   const audioRef = useRef<HTMLAudioElement>(null);
+  const streamControllerRef = useRef<AbortController | null>(null);
+  const streamRunRef = useRef(0);
+  const alertSequenceRef = useRef(0);
+
   const [language, setLanguage] = useState<LanguageCode>("en");
   const [selectedClipId, setSelectedClipId] = useState(
-    playableDemoClips[0]?.id ?? "",
+    demoClips[0]?.id ?? "",
   );
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [activeAlerts, setActiveAlerts] = useState<ActiveAlert[]>([]);
 
   const selectedClip = useMemo(
-    () =>
-      playableDemoClips.find((clip) => clip.id === selectedClipId) ??
-      playableDemoClips[0]!,
+    () => demoClips.find((clip) => clip.id === selectedClipId) ?? demoClips[0]!,
     [selectedClipId],
   );
 
-  const progress = duration > 0 ? currentTime / duration : 0;
-  const isInEventWindow =
-    isPlaying &&
-    progress >= selectedClip.eventWindow.startRatio &&
-    progress <= selectedClip.eventWindow.endRatio;
-  const visibleAlert = isInEventWindow ? selectedClip : null;
+  const visibleAlert = useMemo(
+    () => chooseVisibleAlert(activeAlerts)?.alert ?? null,
+    [activeAlerts],
+  );
 
-  function resetAudioForClip(clip: PlayableDemoClip) {
+  const progress = duration > 0 ? currentTime / duration : 0;
+
+  const applyStreamEvent = useCallback((event: StreamEvent) => {
+    switch (event.type) {
+      case "session_started":
+        alertSequenceRef.current = 0;
+        setActiveAlerts([]);
+        break;
+      case "alert_start": {
+        const sequence = alertSequenceRef.current;
+        alertSequenceRef.current += 1;
+        setActiveAlerts((alerts) => [
+          ...alerts.filter((alert) => alert.eventId !== event.eventId),
+          {
+            eventId: event.eventId,
+            sequence,
+            alert: event.alert,
+          },
+        ]);
+        break;
+      }
+      case "alert_end":
+        setActiveAlerts((alerts) =>
+          alerts.filter((alert) => alert.eventId !== event.eventId),
+        );
+        break;
+      case "session_done":
+        setActiveAlerts([]);
+        break;
+    }
+  }, []);
+
+  const stopAndReset = useCallback(() => {
+    streamControllerRef.current?.abort();
+    streamControllerRef.current = null;
+    streamRunRef.current += 1;
+    alertSequenceRef.current = 0;
+    setActiveAlerts([]);
+
     const audio = audioRef.current;
 
     if (audio) {
       audio.pause();
-      audio.src = clip.audio.src;
       audio.currentTime = 0;
-      audio.load();
     }
 
-    setSelectedClipId(clip.id);
-    setIsPlaying(false);
     setCurrentTime(0);
-    setDuration(0);
+    setIsPlaying(false);
+  }, []);
+
+  const startClip = useCallback(
+    async (clip: DemoClip) => {
+      if (!clip.audio) {
+        return;
+      }
+
+      streamControllerRef.current?.abort();
+      alertSequenceRef.current = 0;
+      setActiveAlerts([]);
+      setSelectedClipId(clip.id);
+      setCurrentTime(0);
+      setDuration(0);
+
+      const audio = audioRef.current;
+
+      if (!audio) {
+        return;
+      }
+
+      audio.pause();
+      audio.muted = false;
+      audio.volume = 1;
+
+      const nextSrc = new URL(clip.audio.src, window.location.href).href;
+      const sourceChanged = audio.currentSrc !== nextSrc && audio.src !== nextSrc;
+
+      if (sourceChanged) {
+        audio.src = clip.audio.src;
+        audio.load();
+      }
+
+      try {
+        audio.currentTime = 0;
+      } catch {
+        // Some browsers reject seeking until metadata exists for a new source.
+      }
+
+      const controller = new AbortController();
+      const runId = streamRunRef.current + 1;
+      streamRunRef.current = runId;
+      streamControllerRef.current = controller;
+
+      try {
+        await audio.play();
+      } catch {
+        if (
+          streamRunRef.current === runId &&
+          !controller.signal.aborted
+        ) {
+          controller.abort();
+          streamControllerRef.current = null;
+          setCurrentTime(0);
+          setIsPlaying(false);
+        }
+
+        return;
+      }
+
+      if (streamRunRef.current !== runId || controller.signal.aborted) {
+        return;
+      }
+
+      setIsPlaying(true);
+
+      void streamDemoEvents({
+        clipId: clip.id,
+        language,
+        signal: controller.signal,
+        allowFallback: false,
+        onEvent: (event) => {
+          if (
+            streamRunRef.current === runId &&
+            !controller.signal.aborted
+          ) {
+            applyStreamEvent(event);
+          }
+        },
+      })
+        .catch((error: unknown) => {
+          if (!controller.signal.aborted) {
+            console.warn("SoundSight stream ended unexpectedly", error);
+          }
+        })
+        .finally(() => {
+          if (streamRunRef.current === runId) {
+            streamControllerRef.current = null;
+          }
+        });
+    },
+    [applyStreamEvent, language],
+  );
+
+  function handleToggleClip(clip: DemoClip) {
+    if (!clip.audio) {
+      return;
+    }
+
+    if (clip.id === selectedClip.id && isPlaying) {
+      stopAndReset();
+      return;
+    }
+
+    void startClip(clip);
   }
 
   function handleSelectClip(clipId: string) {
-    const nextClip = playableDemoClips.find((clip) => clip.id === clipId);
+    const nextClip = demoClips.find((clip) => clip.id === clipId);
 
     if (!nextClip || nextClip.id === selectedClip.id) {
       return;
     }
 
-    resetAudioForClip(nextClip);
+    stopAndReset();
+    setSelectedClipId(nextClip.id);
+    setCurrentTime(0);
+    setDuration(0);
   }
 
-  async function handleToggleClip(clip: PlayableDemoClip) {
-    const audio = audioRef.current;
-
-    if (!audio) {
-      return;
-    }
-
-    if (clip.id === selectedClip.id && isPlaying) {
-      audio.pause();
-      return;
-    }
-
-    if (clip.id !== selectedClip.id) {
-      audio.pause();
-      audio.src = clip.audio.src;
-      audio.currentTime = 0;
-      audio.load();
-      setSelectedClipId(clip.id);
-      setCurrentTime(0);
-      setDuration(0);
-    }
-
-    try {
-      await audio.play();
-    } catch {
-      setIsPlaying(false);
-    }
-  }
+  useEffect(() => {
+    return () => {
+      streamControllerRef.current?.abort();
+    };
+  }, []);
 
   return (
     <main className="h-dvh overflow-hidden bg-[#030507] text-white lg:min-h-screen">
       <audio
         ref={audioRef}
         preload="metadata"
-        src={selectedClip.audio.src}
+        src={selectedClip.audio?.src}
         onLoadedMetadata={(event) => {
           const nextDuration = event.currentTarget.duration;
           setDuration(Number.isFinite(nextDuration) ? nextDuration : 0);
@@ -108,10 +244,8 @@ export default function Home() {
         }}
         onPlay={() => setIsPlaying(true)}
         onPause={() => setIsPlaying(false)}
-        onEnded={(event) => {
-          event.currentTarget.currentTime = 0;
-          setCurrentTime(0);
-          setIsPlaying(false);
+        onEnded={() => {
+          stopAndReset();
         }}
       />
 
@@ -123,12 +257,12 @@ export default function Home() {
           <LanguageSelector value={language} onChange={setLanguage} />
         </header>
 
-        <div className="w-screen max-w-screen min-w-0 shrink-0 space-y-2 overflow-hidden px-3 pb-3 pt-3 lg:hidden">
+        <div className="w-full max-w-full min-w-0 shrink-0 space-y-2 overflow-hidden px-3 pb-3 pt-3 lg:hidden">
           <div className="flex min-w-0 justify-end">
             <LanguageSelector value={language} onChange={setLanguage} />
           </div>
           <ClipSelector
-            clips={playableDemoClips}
+            clips={demoClips}
             selectedClipId={selectedClip.id}
             isPlaying={isPlaying}
             progress={progress}
@@ -138,10 +272,10 @@ export default function Home() {
           />
         </div>
 
-        <section className="flex min-h-0 flex-1 lg:grid lg:items-center lg:gap-16 lg:py-0 lg:grid-cols-[340px_minmax(0,1fr)]">
+        <section className="flex min-h-0 flex-1 lg:grid lg:grid-cols-[340px_minmax(0,1fr)] lg:items-center lg:gap-16 lg:py-0">
           <div className="hidden lg:block">
             <ClipSelector
-              clips={playableDemoClips}
+              clips={demoClips}
               selectedClipId={selectedClip.id}
               isPlaying={isPlaying}
               progress={progress}
@@ -159,4 +293,28 @@ export default function Home() {
       </div>
     </main>
   );
+}
+
+function chooseVisibleAlert(alerts: ActiveAlert[]): ActiveAlert | null {
+  return alerts.reduce<ActiveAlert | null>((visibleAlert, alert) => {
+    if (!visibleAlert) {
+      return alert;
+    }
+
+    const alertPriority = tierPriority[alert.alert.tier];
+    const visiblePriority = tierPriority[visibleAlert.alert.tier];
+
+    if (alertPriority > visiblePriority) {
+      return alert;
+    }
+
+    if (
+      alertPriority === visiblePriority &&
+      alert.sequence > visibleAlert.sequence
+    ) {
+      return alert;
+    }
+
+    return visibleAlert;
+  }, null);
 }
