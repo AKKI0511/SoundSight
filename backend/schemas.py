@@ -6,6 +6,13 @@ from pydantic import BaseModel, ConfigDict, Field
 LanguageCode = Literal["en", "hi", "es"]
 AlertTier = Literal["emergency", "social", "ambient"]
 EngineState = Literal["IDLE", "CANDIDATE", "ACTIVE", "COOLDOWN"]
+CandidateType = Literal[
+    "fire_alarm",
+    "emergency_vehicle",
+    "door_knock",
+    "speech_attention",
+    "unknown",
+]
 
 
 class ApiModel(BaseModel):
@@ -50,6 +57,78 @@ class SessionStartedEvent(ApiModel):
     timestamp_ms: int = Field(default=0, alias="timestampMs")
 
 
+class EngineLogEvent(ApiModel):
+    type: Literal["engine_log"] = "engine_log"
+    session_id: str = Field(alias="sessionId")
+    timestamp_ms: int = Field(alias="timestampMs")
+    window_start_ms: int = Field(alias="windowStartMs")
+    window_end_ms: int = Field(alias="windowEndMs")
+    rms: float
+    noise_floor: float = Field(alias="noiseFloor")
+    rms_z_score: float = Field(alias="rmsZScore")
+    onset_score: float = Field(alias="onsetScore")
+    spectral_flux: float = Field(alias="spectralFlux")
+    zero_crossing_rate: float = Field(alias="zeroCrossingRate")
+    spectral_centroid: float = Field(alias="spectralCentroid")
+    sustained_energy_score: float = Field(alias="sustainedEnergyScore")
+    silence_score: float = Field(alias="silenceScore")
+    speech_probability: float = Field(alias="speechProbability")
+    speech_source: str = Field(alias="speechSource")
+    speech_warning: str | None = Field(default=None, alias="speechWarning")
+    candidate_type: CandidateType | None = Field(alias="candidateType")
+    candidate_confidence: float = Field(alias="candidateConfidence")
+    should_call_model: bool = Field(alias="shouldCallModel")
+    state: EngineState
+    candidate: bool
+
+
+class CandidateStartEvent(ApiModel):
+    type: Literal["candidate_start"] = "candidate_start"
+    session_id: str = Field(alias="sessionId")
+    candidate_id: str = Field(alias="candidateId")
+    timestamp_ms: int = Field(alias="timestampMs")
+    window_start_ms: int = Field(alias="windowStartMs")
+    window_end_ms: int = Field(alias="windowEndMs")
+    candidate_type: CandidateType = Field(alias="candidateType")
+    candidate_confidence: float = Field(alias="candidateConfidence")
+
+
+class CandidateUpdateEvent(ApiModel):
+    type: Literal["candidate_update"] = "candidate_update"
+    session_id: str = Field(alias="sessionId")
+    candidate_id: str = Field(alias="candidateId")
+    timestamp_ms: int = Field(alias="timestampMs")
+    window_start_ms: int = Field(alias="windowStartMs")
+    window_end_ms: int = Field(alias="windowEndMs")
+    candidate_type: CandidateType = Field(alias="candidateType")
+    candidate_confidence: float = Field(alias="candidateConfidence")
+    should_call_model: bool = Field(alias="shouldCallModel")
+    state: EngineState
+
+
+class ModelCallEvent(ApiModel):
+    type: Literal["model_call"] = "model_call"
+    session_id: str = Field(alias="sessionId")
+    candidate_id: str = Field(alias="candidateId")
+    timestamp_ms: int = Field(alias="timestampMs")
+    clip_id: str = Field(alias="clipId")
+    language: LanguageCode
+    reason: str
+    window_start_ms: int = Field(alias="windowStartMs")
+    window_end_ms: int = Field(alias="windowEndMs")
+    candidate_type: CandidateType = Field(alias="candidateType")
+    candidate_confidence: float = Field(alias="candidateConfidence")
+
+
+class ModelResultEvent(ApiModel):
+    type: Literal["model_result"] = "model_result"
+    session_id: str = Field(alias="sessionId")
+    candidate_id: str = Field(alias="candidateId")
+    timestamp_ms: int = Field(alias="timestampMs")
+    clip_id: str = Field(alias="clipId")
+    analysis: AlertAnalysis
+
+
 class AlertStartEvent(ApiModel):
     type: Literal["alert_start"] = "alert_start"
     session_id: str = Field(alias="sessionId")
@@ -71,32 +150,6 @@ class SessionDoneEvent(ApiModel):
     timestamp_ms: int = Field(alias="timestampMs")
 
 
-class EngineLogEvent(ApiModel):
-    type: Literal["engine_log"] = "engine_log"
-    session_id: str = Field(alias="sessionId")
-    timestamp_ms: int = Field(alias="timestampMs")
-    window_start_ms: int = Field(alias="windowStartMs")
-    window_end_ms: int = Field(alias="windowEndMs")
-    rms: float
-    noise_floor: float = Field(alias="noiseFloor")
-    energy_ratio: float = Field(alias="energyRatio")
-    onset_score: float = Field(alias="onsetScore")
-    sustained_energy: bool = Field(alias="sustainedEnergy")
-    state: EngineState
-    candidate: bool
-
-
-class ModelCallEvent(ApiModel):
-    type: Literal["model_call"] = "model_call"
-    session_id: str = Field(alias="sessionId")
-    timestamp_ms: int = Field(alias="timestampMs")
-    clip_id: str = Field(alias="clipId")
-    reason: str
-    window_start_ms: int = Field(alias="windowStartMs")
-    window_end_ms: int = Field(alias="windowEndMs")
-    analysis: AlertAnalysis
-
-
 class ErrorEvent(ApiModel):
     type: Literal["error"] = "error"
     session_id: str = Field(alias="sessionId")
@@ -109,7 +162,10 @@ class ErrorEvent(ApiModel):
 StreamEvent = (
     SessionStartedEvent
     | EngineLogEvent
+    | CandidateStartEvent
+    | CandidateUpdateEvent
     | ModelCallEvent
+    | ModelResultEvent
     | AlertStartEvent
     | AlertEndEvent
     | SessionDoneEvent

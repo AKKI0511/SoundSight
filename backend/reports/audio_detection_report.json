@@ -1,0 +1,2478 @@
+{
+  "generatedBy": "SoundSight backend audio detection report",
+  "audioDirectoryCandidates": [
+    "C:\\Users\\akkij\\Desktop\\github-repos\\SoundSight\\SoundSight\\supporting-data-images-audio\\audio-clips",
+    "C:\\Users\\akkij\\Desktop\\github-repos\\SoundSight\\SoundSight\\supporting-data-images-audio",
+    "C:\\Users\\akkij\\Desktop\\github-repos\\SoundSight\\SoundSight\\supporint-data-image-audio\\audio-clips",
+    "C:\\Users\\akkij\\Desktop\\github-repos\\SoundSight\\SoundSight\\supporint-data-image-audio",
+    "C:\\Users\\akkij\\Desktop\\github-repos\\SoundSight\\SoundSight\\supporint-data-images-audio\\audio-clips",
+    "C:\\Users\\akkij\\Desktop\\github-repos\\SoundSight\\SoundSight\\supporint-data-images-audio"
+  ],
+  "clips": [
+    {
+      "fileName": "baby-crying-434113.mp3",
+      "clipId": "attention_outdoors",
+      "durationMs": 12147,
+      "candidateIntervals": [
+        {
+          "startMs": 500,
+          "endMs": 12147,
+          "candidateType": "speech_attention",
+          "maxConfidence": 1.0
+        }
+      ],
+      "candidateTimeline": [
+        {
+          "timestampMs": 500,
+          "candidateType": "speech_attention",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "CANDIDATE"
+        },
+        {
+          "timestampMs": 1000,
+          "candidateType": "speech_attention",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 1500,
+          "candidateType": "speech_attention",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 2000,
+          "candidateType": "speech_attention",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 2500,
+          "candidateType": "speech_attention",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 3000,
+          "candidateType": "speech_attention",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 3500,
+          "candidateType": "speech_attention",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 4000,
+          "candidateType": "speech_attention",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 4500,
+          "candidateType": "speech_attention",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 5000,
+          "candidateType": "speech_attention",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 5500,
+          "candidateType": "speech_attention",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 6000,
+          "candidateType": "speech_attention",
+          "confidence": 0.883,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 6500,
+          "candidateType": "speech_attention",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 7000,
+          "candidateType": "speech_attention",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 7500,
+          "candidateType": "speech_attention",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 8000,
+          "candidateType": "speech_attention",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 8500,
+          "candidateType": "speech_attention",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 9000,
+          "candidateType": "speech_attention",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 9500,
+          "candidateType": "speech_attention",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 10000,
+          "candidateType": "speech_attention",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 10500,
+          "candidateType": "speech_attention",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 11000,
+          "candidateType": "speech_attention",
+          "confidence": 0.944,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 11500,
+          "candidateType": "speech_attention",
+          "confidence": 0.977,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 12000,
+          "candidateType": "speech_attention",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 12147,
+          "candidateType": "speech_attention",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        }
+      ],
+      "candidateEvents": [
+        {
+          "type": "candidate_start",
+          "timestampMs": 500,
+          "candidateId": "candidate_1",
+          "candidateType": "speech_attention",
+          "confidence": 1.0
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 500,
+          "candidateId": "candidate_1",
+          "candidateType": "speech_attention",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "CANDIDATE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 1000,
+          "candidateId": "candidate_1",
+          "candidateType": "speech_attention",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 1500,
+          "candidateId": "candidate_1",
+          "candidateType": "speech_attention",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 2000,
+          "candidateId": "candidate_1",
+          "candidateType": "speech_attention",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 2500,
+          "candidateId": "candidate_1",
+          "candidateType": "speech_attention",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 3000,
+          "candidateId": "candidate_1",
+          "candidateType": "speech_attention",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 3500,
+          "candidateId": "candidate_1",
+          "candidateType": "speech_attention",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 4000,
+          "candidateId": "candidate_1",
+          "candidateType": "speech_attention",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 4500,
+          "candidateId": "candidate_1",
+          "candidateType": "speech_attention",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 5000,
+          "candidateId": "candidate_1",
+          "candidateType": "speech_attention",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 5500,
+          "candidateId": "candidate_1",
+          "candidateType": "speech_attention",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 6000,
+          "candidateId": "candidate_1",
+          "candidateType": "speech_attention",
+          "confidence": 0.883,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 6500,
+          "candidateId": "candidate_1",
+          "candidateType": "speech_attention",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 7000,
+          "candidateId": "candidate_1",
+          "candidateType": "speech_attention",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 7500,
+          "candidateId": "candidate_1",
+          "candidateType": "speech_attention",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 8000,
+          "candidateId": "candidate_1",
+          "candidateType": "speech_attention",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 8500,
+          "candidateId": "candidate_1",
+          "candidateType": "speech_attention",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 9000,
+          "candidateId": "candidate_1",
+          "candidateType": "speech_attention",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 9500,
+          "candidateId": "candidate_1",
+          "candidateType": "speech_attention",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 10000,
+          "candidateId": "candidate_1",
+          "candidateType": "speech_attention",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 10500,
+          "candidateId": "candidate_1",
+          "candidateType": "speech_attention",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 11000,
+          "candidateId": "candidate_1",
+          "candidateType": "speech_attention",
+          "confidence": 0.944,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 11500,
+          "candidateId": "candidate_1",
+          "candidateType": "speech_attention",
+          "confidence": 0.977,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 12000,
+          "candidateId": "candidate_1",
+          "candidateType": "speech_attention",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 12147,
+          "candidateId": "candidate_1",
+          "candidateType": "speech_attention",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        }
+      ],
+      "vad": {
+        "sileroLoaded": false,
+        "sources": [
+          "fallback"
+        ],
+        "speechIntervals": [
+          {
+            "startMs": 500,
+            "endMs": 12147,
+            "source": "fallback",
+            "maxProbability": 1.0
+          }
+        ]
+      },
+      "modelCalls": [
+        {
+          "timestampMs": 500,
+          "candidateId": "candidate_1",
+          "candidateType": "speech_attention",
+          "confidence": 1.0,
+          "windowStartMs": 0,
+          "windowEndMs": 500
+        }
+      ],
+      "modelResults": [
+        {
+          "timestampMs": 500,
+          "candidateId": "candidate_1",
+          "detectedSoundType": "attention_outdoors",
+          "shouldAlert": true,
+          "confidence": 0.99,
+          "alertText": "Someone wants your attention.",
+          "action": "Look around safely."
+        }
+      ],
+      "alertStarts": [
+        {
+          "timestampMs": 500,
+          "eventId": "attention_outdoors_1",
+          "soundType": "attention_outdoors",
+          "confidence": 0.99
+        }
+      ],
+      "alertEnds": [
+        {
+          "timestampMs": 12147,
+          "eventId": "attention_outdoors_1"
+        }
+      ],
+      "totalAlertsEmitted": 1,
+      "warnings": [
+        "Silero VAD unavailable: No module named 'silero_vad'"
+      ],
+      "errors": []
+    },
+    {
+      "fileName": "baby-crying-loud-100441.mp3",
+      "clipId": "attention_outdoors",
+      "durationMs": 9360,
+      "candidateIntervals": [
+        {
+          "startMs": 500,
+          "endMs": 9360,
+          "candidateType": "speech_attention",
+          "maxConfidence": 1.0
+        }
+      ],
+      "candidateTimeline": [
+        {
+          "timestampMs": 500,
+          "candidateType": "speech_attention",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "CANDIDATE"
+        },
+        {
+          "timestampMs": 1000,
+          "candidateType": "speech_attention",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 1500,
+          "candidateType": "speech_attention",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 2000,
+          "candidateType": "speech_attention",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 2500,
+          "candidateType": "speech_attention",
+          "confidence": 0.97,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 3000,
+          "candidateType": "speech_attention",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 3500,
+          "candidateType": "speech_attention",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 4000,
+          "candidateType": "speech_attention",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 4500,
+          "candidateType": "speech_attention",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 5000,
+          "candidateType": "speech_attention",
+          "confidence": 0.975,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 5500,
+          "candidateType": "speech_attention",
+          "confidence": 0.834,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 6000,
+          "candidateType": "speech_attention",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 6500,
+          "candidateType": "speech_attention",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 7000,
+          "candidateType": "speech_attention",
+          "confidence": 0.874,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 7500,
+          "candidateType": "speech_attention",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 8000,
+          "candidateType": "speech_attention",
+          "confidence": 0.913,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 8500,
+          "candidateType": "speech_attention",
+          "confidence": 0.858,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 9000,
+          "candidateType": "speech_attention",
+          "confidence": 0.837,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 9360,
+          "candidateType": "speech_attention",
+          "confidence": 0.912,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        }
+      ],
+      "candidateEvents": [
+        {
+          "type": "candidate_start",
+          "timestampMs": 500,
+          "candidateId": "candidate_1",
+          "candidateType": "speech_attention",
+          "confidence": 1.0
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 500,
+          "candidateId": "candidate_1",
+          "candidateType": "speech_attention",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "CANDIDATE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 1000,
+          "candidateId": "candidate_1",
+          "candidateType": "speech_attention",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 1500,
+          "candidateId": "candidate_1",
+          "candidateType": "speech_attention",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 2000,
+          "candidateId": "candidate_1",
+          "candidateType": "speech_attention",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 2500,
+          "candidateId": "candidate_1",
+          "candidateType": "speech_attention",
+          "confidence": 0.97,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 3000,
+          "candidateId": "candidate_1",
+          "candidateType": "speech_attention",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 3500,
+          "candidateId": "candidate_1",
+          "candidateType": "speech_attention",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 4000,
+          "candidateId": "candidate_1",
+          "candidateType": "speech_attention",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 4500,
+          "candidateId": "candidate_1",
+          "candidateType": "speech_attention",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 5000,
+          "candidateId": "candidate_1",
+          "candidateType": "speech_attention",
+          "confidence": 0.975,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 5500,
+          "candidateId": "candidate_1",
+          "candidateType": "speech_attention",
+          "confidence": 0.834,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 6000,
+          "candidateId": "candidate_1",
+          "candidateType": "speech_attention",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 6500,
+          "candidateId": "candidate_1",
+          "candidateType": "speech_attention",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 7000,
+          "candidateId": "candidate_1",
+          "candidateType": "speech_attention",
+          "confidence": 0.874,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 7500,
+          "candidateId": "candidate_1",
+          "candidateType": "speech_attention",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 8000,
+          "candidateId": "candidate_1",
+          "candidateType": "speech_attention",
+          "confidence": 0.913,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 8500,
+          "candidateId": "candidate_1",
+          "candidateType": "speech_attention",
+          "confidence": 0.858,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 9000,
+          "candidateId": "candidate_1",
+          "candidateType": "speech_attention",
+          "confidence": 0.837,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 9360,
+          "candidateId": "candidate_1",
+          "candidateType": "speech_attention",
+          "confidence": 0.912,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        }
+      ],
+      "vad": {
+        "sileroLoaded": false,
+        "sources": [
+          "fallback"
+        ],
+        "speechIntervals": [
+          {
+            "startMs": 500,
+            "endMs": 9360,
+            "source": "fallback",
+            "maxProbability": 1.0
+          }
+        ]
+      },
+      "modelCalls": [
+        {
+          "timestampMs": 500,
+          "candidateId": "candidate_1",
+          "candidateType": "speech_attention",
+          "confidence": 1.0,
+          "windowStartMs": 0,
+          "windowEndMs": 500
+        }
+      ],
+      "modelResults": [
+        {
+          "timestampMs": 500,
+          "candidateId": "candidate_1",
+          "detectedSoundType": "attention_outdoors",
+          "shouldAlert": true,
+          "confidence": 0.99,
+          "alertText": "Someone wants your attention.",
+          "action": "Look around safely."
+        }
+      ],
+      "alertStarts": [
+        {
+          "timestampMs": 500,
+          "eventId": "attention_outdoors_1",
+          "soundType": "attention_outdoors",
+          "confidence": 0.99
+        }
+      ],
+      "alertEnds": [
+        {
+          "timestampMs": 9360,
+          "eventId": "attention_outdoors_1"
+        }
+      ],
+      "totalAlertsEmitted": 1,
+      "warnings": [
+        "Silero VAD unavailable: No module named 'silero_vad'"
+      ],
+      "errors": []
+    },
+    {
+      "fileName": "fire-alarm-414915.mp3",
+      "clipId": "fire_alarm",
+      "durationMs": 15096,
+      "candidateIntervals": [
+        {
+          "startMs": 500,
+          "endMs": 15096,
+          "candidateType": "fire_alarm",
+          "maxConfidence": 1.0
+        }
+      ],
+      "candidateTimeline": [
+        {
+          "timestampMs": 500,
+          "candidateType": "fire_alarm",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "CANDIDATE"
+        },
+        {
+          "timestampMs": 1000,
+          "candidateType": "fire_alarm",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 1500,
+          "candidateType": "fire_alarm",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 2000,
+          "candidateType": "fire_alarm",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 2500,
+          "candidateType": "fire_alarm",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 3000,
+          "candidateType": "fire_alarm",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 3500,
+          "candidateType": "fire_alarm",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 4000,
+          "candidateType": "fire_alarm",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 4500,
+          "candidateType": "fire_alarm",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 5000,
+          "candidateType": "fire_alarm",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 5500,
+          "candidateType": "fire_alarm",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 6000,
+          "candidateType": "fire_alarm",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 6500,
+          "candidateType": "fire_alarm",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 7000,
+          "candidateType": "fire_alarm",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 7500,
+          "candidateType": "fire_alarm",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 8000,
+          "candidateType": "fire_alarm",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 8500,
+          "candidateType": "fire_alarm",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 9000,
+          "candidateType": "fire_alarm",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 9500,
+          "candidateType": "fire_alarm",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 10000,
+          "candidateType": "fire_alarm",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 10500,
+          "candidateType": "fire_alarm",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 11000,
+          "candidateType": "fire_alarm",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 11500,
+          "candidateType": "fire_alarm",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 12000,
+          "candidateType": "fire_alarm",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 12500,
+          "candidateType": "fire_alarm",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 13000,
+          "candidateType": "fire_alarm",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 13500,
+          "candidateType": "fire_alarm",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 14000,
+          "candidateType": "fire_alarm",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 14500,
+          "candidateType": "fire_alarm",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 15000,
+          "candidateType": "fire_alarm",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 15096,
+          "candidateType": "fire_alarm",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        }
+      ],
+      "candidateEvents": [
+        {
+          "type": "candidate_start",
+          "timestampMs": 500,
+          "candidateId": "candidate_1",
+          "candidateType": "fire_alarm",
+          "confidence": 1.0
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 500,
+          "candidateId": "candidate_1",
+          "candidateType": "fire_alarm",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "CANDIDATE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 1000,
+          "candidateId": "candidate_1",
+          "candidateType": "fire_alarm",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 1500,
+          "candidateId": "candidate_1",
+          "candidateType": "fire_alarm",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 2000,
+          "candidateId": "candidate_1",
+          "candidateType": "fire_alarm",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 2500,
+          "candidateId": "candidate_1",
+          "candidateType": "fire_alarm",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 3000,
+          "candidateId": "candidate_1",
+          "candidateType": "fire_alarm",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 3500,
+          "candidateId": "candidate_1",
+          "candidateType": "fire_alarm",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 4000,
+          "candidateId": "candidate_1",
+          "candidateType": "fire_alarm",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 4500,
+          "candidateId": "candidate_1",
+          "candidateType": "fire_alarm",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 5000,
+          "candidateId": "candidate_1",
+          "candidateType": "fire_alarm",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 5500,
+          "candidateId": "candidate_1",
+          "candidateType": "fire_alarm",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 6000,
+          "candidateId": "candidate_1",
+          "candidateType": "fire_alarm",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 6500,
+          "candidateId": "candidate_1",
+          "candidateType": "fire_alarm",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 7000,
+          "candidateId": "candidate_1",
+          "candidateType": "fire_alarm",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 7500,
+          "candidateId": "candidate_1",
+          "candidateType": "fire_alarm",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 8000,
+          "candidateId": "candidate_1",
+          "candidateType": "fire_alarm",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 8500,
+          "candidateId": "candidate_1",
+          "candidateType": "fire_alarm",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 9000,
+          "candidateId": "candidate_1",
+          "candidateType": "fire_alarm",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 9500,
+          "candidateId": "candidate_1",
+          "candidateType": "fire_alarm",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 10000,
+          "candidateId": "candidate_1",
+          "candidateType": "fire_alarm",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 10500,
+          "candidateId": "candidate_1",
+          "candidateType": "fire_alarm",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 11000,
+          "candidateId": "candidate_1",
+          "candidateType": "fire_alarm",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 11500,
+          "candidateId": "candidate_1",
+          "candidateType": "fire_alarm",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 12000,
+          "candidateId": "candidate_1",
+          "candidateType": "fire_alarm",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 12500,
+          "candidateId": "candidate_1",
+          "candidateType": "fire_alarm",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 13000,
+          "candidateId": "candidate_1",
+          "candidateType": "fire_alarm",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 13500,
+          "candidateId": "candidate_1",
+          "candidateType": "fire_alarm",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 14000,
+          "candidateId": "candidate_1",
+          "candidateType": "fire_alarm",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 14500,
+          "candidateId": "candidate_1",
+          "candidateType": "fire_alarm",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 15000,
+          "candidateId": "candidate_1",
+          "candidateType": "fire_alarm",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 15096,
+          "candidateId": "candidate_1",
+          "candidateType": "fire_alarm",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        }
+      ],
+      "vad": {
+        "sileroLoaded": false,
+        "sources": [
+          "fallback"
+        ],
+        "speechIntervals": []
+      },
+      "modelCalls": [
+        {
+          "timestampMs": 500,
+          "candidateId": "candidate_1",
+          "candidateType": "fire_alarm",
+          "confidence": 1.0,
+          "windowStartMs": 0,
+          "windowEndMs": 500
+        }
+      ],
+      "modelResults": [
+        {
+          "timestampMs": 500,
+          "candidateId": "candidate_1",
+          "detectedSoundType": "fire_alarm",
+          "shouldAlert": true,
+          "confidence": 0.99,
+          "alertText": "Fire alarm detected.",
+          "action": "Move to safety now."
+        }
+      ],
+      "alertStarts": [
+        {
+          "timestampMs": 500,
+          "eventId": "fire_alarm_1",
+          "soundType": "fire_alarm",
+          "confidence": 0.99
+        }
+      ],
+      "alertEnds": [
+        {
+          "timestampMs": 15096,
+          "eventId": "fire_alarm_1"
+        }
+      ],
+      "totalAlertsEmitted": 1,
+      "warnings": [
+        "Silero VAD unavailable: No module named 'silero_vad'"
+      ],
+      "errors": []
+    },
+    {
+      "fileName": "freesound_community-german-ambulance-29046.mp3",
+      "clipId": "emergency_vehicle",
+      "durationMs": 16536,
+      "candidateIntervals": [
+        {
+          "startMs": 500,
+          "endMs": 16536,
+          "candidateType": "emergency_vehicle",
+          "maxConfidence": 1.0
+        }
+      ],
+      "candidateTimeline": [
+        {
+          "timestampMs": 500,
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "CANDIDATE"
+        },
+        {
+          "timestampMs": 1000,
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 1500,
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 2000,
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 2500,
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 3000,
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 3500,
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 4000,
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 4500,
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 5000,
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 5500,
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 6000,
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 6500,
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 7000,
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 7500,
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 8000,
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 8500,
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 9000,
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 9500,
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 10000,
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 10500,
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 11000,
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 11500,
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 12000,
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 12500,
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 13000,
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 13500,
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 14000,
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 14500,
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 15000,
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 15500,
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 16000,
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 16500,
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 16536,
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        }
+      ],
+      "candidateEvents": [
+        {
+          "type": "candidate_start",
+          "timestampMs": 500,
+          "candidateId": "candidate_1",
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 500,
+          "candidateId": "candidate_1",
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "CANDIDATE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 1000,
+          "candidateId": "candidate_1",
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 1500,
+          "candidateId": "candidate_1",
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 2000,
+          "candidateId": "candidate_1",
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 2500,
+          "candidateId": "candidate_1",
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 3000,
+          "candidateId": "candidate_1",
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 3500,
+          "candidateId": "candidate_1",
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 4000,
+          "candidateId": "candidate_1",
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 4500,
+          "candidateId": "candidate_1",
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 5000,
+          "candidateId": "candidate_1",
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 5500,
+          "candidateId": "candidate_1",
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 6000,
+          "candidateId": "candidate_1",
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 6500,
+          "candidateId": "candidate_1",
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 7000,
+          "candidateId": "candidate_1",
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 7500,
+          "candidateId": "candidate_1",
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 8000,
+          "candidateId": "candidate_1",
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 8500,
+          "candidateId": "candidate_1",
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 9000,
+          "candidateId": "candidate_1",
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 9500,
+          "candidateId": "candidate_1",
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 10000,
+          "candidateId": "candidate_1",
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 10500,
+          "candidateId": "candidate_1",
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 11000,
+          "candidateId": "candidate_1",
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 11500,
+          "candidateId": "candidate_1",
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 12000,
+          "candidateId": "candidate_1",
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 12500,
+          "candidateId": "candidate_1",
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 13000,
+          "candidateId": "candidate_1",
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 13500,
+          "candidateId": "candidate_1",
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 14000,
+          "candidateId": "candidate_1",
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 14500,
+          "candidateId": "candidate_1",
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 15000,
+          "candidateId": "candidate_1",
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 15500,
+          "candidateId": "candidate_1",
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 16000,
+          "candidateId": "candidate_1",
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 16500,
+          "candidateId": "candidate_1",
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 16536,
+          "candidateId": "candidate_1",
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        }
+      ],
+      "vad": {
+        "sileroLoaded": false,
+        "sources": [
+          "fallback"
+        ],
+        "speechIntervals": []
+      },
+      "modelCalls": [
+        {
+          "timestampMs": 500,
+          "candidateId": "candidate_1",
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "windowStartMs": 0,
+          "windowEndMs": 500
+        }
+      ],
+      "modelResults": [
+        {
+          "timestampMs": 500,
+          "candidateId": "candidate_1",
+          "detectedSoundType": "emergency_vehicle",
+          "shouldAlert": true,
+          "confidence": 0.99,
+          "alertText": "Emergency vehicle nearby.",
+          "action": "Look around now."
+        }
+      ],
+      "alertStarts": [
+        {
+          "timestampMs": 500,
+          "eventId": "emergency_vehicle_1",
+          "soundType": "emergency_vehicle",
+          "confidence": 0.99
+        }
+      ],
+      "alertEnds": [
+        {
+          "timestampMs": 16536,
+          "eventId": "emergency_vehicle_1"
+        }
+      ],
+      "totalAlertsEmitted": 1,
+      "warnings": [
+        "Silero VAD unavailable: No module named 'silero_vad'"
+      ],
+      "errors": []
+    },
+    {
+      "fileName": "spinopel-ambulance-siren-364900.mp3",
+      "clipId": "emergency_vehicle",
+      "durationMs": 10971,
+      "candidateIntervals": [
+        {
+          "startMs": 500,
+          "endMs": 10971,
+          "candidateType": "emergency_vehicle",
+          "maxConfidence": 1.0
+        }
+      ],
+      "candidateTimeline": [
+        {
+          "timestampMs": 500,
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "CANDIDATE"
+        },
+        {
+          "timestampMs": 1000,
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 1500,
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 2000,
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 2500,
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 3000,
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 3500,
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 4000,
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 4500,
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 5000,
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 5500,
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 6000,
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 6500,
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 7000,
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 7500,
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 8000,
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 8500,
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 9000,
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 9500,
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 10000,
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 10500,
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "timestampMs": 10971,
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        }
+      ],
+      "candidateEvents": [
+        {
+          "type": "candidate_start",
+          "timestampMs": 500,
+          "candidateId": "candidate_1",
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 500,
+          "candidateId": "candidate_1",
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "CANDIDATE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 1000,
+          "candidateId": "candidate_1",
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 1500,
+          "candidateId": "candidate_1",
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 2000,
+          "candidateId": "candidate_1",
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 2500,
+          "candidateId": "candidate_1",
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 3000,
+          "candidateId": "candidate_1",
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 3500,
+          "candidateId": "candidate_1",
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 4000,
+          "candidateId": "candidate_1",
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 4500,
+          "candidateId": "candidate_1",
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 5000,
+          "candidateId": "candidate_1",
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 5500,
+          "candidateId": "candidate_1",
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 6000,
+          "candidateId": "candidate_1",
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 6500,
+          "candidateId": "candidate_1",
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 7000,
+          "candidateId": "candidate_1",
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 7500,
+          "candidateId": "candidate_1",
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 8000,
+          "candidateId": "candidate_1",
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 8500,
+          "candidateId": "candidate_1",
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 9000,
+          "candidateId": "candidate_1",
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 9500,
+          "candidateId": "candidate_1",
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 10000,
+          "candidateId": "candidate_1",
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 10500,
+          "candidateId": "candidate_1",
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        },
+        {
+          "type": "candidate_update",
+          "timestampMs": 10971,
+          "candidateId": "candidate_1",
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "shouldCallModel": true,
+          "state": "ACTIVE"
+        }
+      ],
+      "vad": {
+        "sileroLoaded": false,
+        "sources": [
+          "fallback"
+        ],
+        "speechIntervals": []
+      },
+      "modelCalls": [
+        {
+          "timestampMs": 500,
+          "candidateId": "candidate_1",
+          "candidateType": "emergency_vehicle",
+          "confidence": 1.0,
+          "windowStartMs": 0,
+          "windowEndMs": 500
+        }
+      ],
+      "modelResults": [
+        {
+          "timestampMs": 500,
+          "candidateId": "candidate_1",
+          "detectedSoundType": "emergency_vehicle",
+          "shouldAlert": true,
+          "confidence": 0.99,
+          "alertText": "Emergency vehicle nearby.",
+          "action": "Look around now."
+        }
+      ],
+      "alertStarts": [
+        {
+          "timestampMs": 500,
+          "eventId": "emergency_vehicle_1",
+          "soundType": "emergency_vehicle",
+          "confidence": 0.99
+        }
+      ],
+      "alertEnds": [
+        {
+          "timestampMs": 10971,
+          "eventId": "emergency_vehicle_1"
+        }
+      ],
+      "totalAlertsEmitted": 1,
+      "warnings": [
+        "Silero VAD unavailable: No module named 'silero_vad'"
+      ],
+      "errors": []
+    }
+  ]
+}

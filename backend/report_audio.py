@@ -1,56 +1,73 @@
+import asyncio
+import json
 from pathlib import Path
+from typing import Any
 
-from audio_engine import (
-    canonical_clip_id_for_path,
-    iter_streaming_detection_events,
-    list_supported_audio_files,
-    load_audio_clip,
-)
+from audio_engine import iter_streaming_detection_events
+from audio_loader import canonical_clip_id_for_path, list_supported_audio_files, load_audio_clip
+from config import DEFAULT_CONFIG
 from schemas import (
     AlertEndEvent,
     AlertStartEvent,
+    CandidateStartEvent,
+    CandidateUpdateEvent,
     EngineLogEvent,
     ErrorEvent,
     ModelCallEvent,
+    ModelResultEvent,
     SessionDoneEvent,
 )
 
 
-REPORT_PATH = Path(__file__).resolve().parent / "reports" / "audio_detection_report.md"
+REPORT_DIR = Path(__file__).resolve().parent / "reports"
+MARKDOWN_REPORT_PATH = REPORT_DIR / "audio_detection_report.md"
+JSON_REPORT_PATH = REPORT_DIR / "audio_detection_report.json"
 
 
 def main() -> None:
-    audio_files = list_supported_audio_files()
-    lines: list[str] = ["# SoundSight Audio Detection Report", ""]
+    summaries = asyncio.run(build_report())
+    markdown = format_markdown_report(summaries)
+    json_payload = {
+        "generatedBy": "SoundSight backend audio detection report",
+        "audioDirectoryCandidates": [
+            str(path) for path in DEFAULT_CONFIG.paths.audio_root_candidates
+        ],
+        "clips": summaries,
+    }
 
-    if not audio_files:
-        lines.extend(["No supported audio files found.", ""])
+    REPORT_DIR.mkdir(parents=True, exist_ok=True)
+    MARKDOWN_REPORT_PATH.write_text(markdown, encoding="utf-8")
+    JSON_REPORT_PATH.write_text(
+        json.dumps(json_payload, indent=2, ensure_ascii=False),
+        encoding="utf-8",
+    )
 
-    for audio_path in audio_files:
+    print(markdown)
+    print(f"Saved markdown report to {MARKDOWN_REPORT_PATH}")
+    print(f"Saved JSON report to {JSON_REPORT_PATH}")
+
+
+async def build_report() -> list[dict[str, Any]]:
+    summaries: list[dict[str, Any]] = []
+    for audio_path in list_supported_audio_files():
         clip_id = canonical_clip_id_for_path(audio_path)
-        session_id = f"report_{audio_path.stem}"
-        summary = summarize_audio_file(audio_path, clip_id, session_id)
-        lines.extend(format_summary(summary))
-        lines.append("")
-
-    report = "\n".join(lines).rstrip() + "\n"
-    print(report)
-    REPORT_PATH.parent.mkdir(parents=True, exist_ok=True)
-    REPORT_PATH.write_text(report, encoding="utf-8")
-    print(f"Saved report to {REPORT_PATH}")
+        summaries.append(await summarize_audio_file(audio_path, clip_id))
+    return summaries
 
 
-def summarize_audio_file(
-    audio_path: Path,
-    clip_id: str,
-    session_id: str,
-) -> dict[str, object]:
-    candidate_intervals: list[tuple[int, int]] = []
-    model_calls: list[int] = []
-    alert_starts: list[int] = []
-    alert_ends: list[int] = []
-    errors: list[str] = []
+async def summarize_audio_file(audio_path: Path, clip_id: str) -> dict[str, Any]:
+    session_id = f"report_{audio_path.stem}"
     duration_ms = 0
+    warnings: list[str] = []
+    errors: list[str] = []
+    candidate_intervals: list[dict[str, Any]] = []
+    candidate_timeline: list[dict[str, Any]] = []
+    speech_intervals: list[dict[str, Any]] = []
+    model_calls: list[dict[str, Any]] = []
+    model_results: list[dict[str, Any]] = []
+    alert_starts: list[dict[str, Any]] = []
+    alert_ends: list[dict[str, Any]] = []
+    candidate_events: list[dict[str, Any]] = []
 
     try:
         loaded_clip = load_audio_clip(clip_id, audio_path=audio_path)
@@ -58,97 +75,273 @@ def summarize_audio_file(
     except Exception as exc:
         errors.append(str(exc))
 
-    candidate_start: int | None = None
-    last_candidate_ts: int | None = None
+    candidate_open: dict[str, Any] | None = None
+    speech_open: dict[str, Any] | None = None
+    vad_sources: set[str] = set()
 
-    for event in iter_streaming_detection_events(
+    async for event in iter_streaming_detection_events(
         clip_id,
         session_id,
         audio_path=audio_path,
     ):
         if isinstance(event, EngineLogEvent):
-            if event.candidate:
-                if candidate_start is None:
-                    candidate_start = event.timestamp_ms
-                last_candidate_ts = event.timestamp_ms
-            elif candidate_start is not None:
-                candidate_intervals.append(
-                    (candidate_start, last_candidate_ts or event.timestamp_ms)
+            vad_sources.add(event.speech_source)
+            if event.speech_warning and event.speech_warning not in warnings:
+                warnings.append(event.speech_warning)
+
+            if event.candidate_type is not None or event.candidate_confidence > 0:
+                candidate_timeline.append(
+                    {
+                        "timestampMs": event.timestamp_ms,
+                        "candidateType": event.candidate_type,
+                        "confidence": event.candidate_confidence,
+                        "shouldCallModel": event.should_call_model,
+                        "state": event.state,
+                    }
                 )
-                candidate_start = None
-                last_candidate_ts = None
+
+            if event.candidate:
+                if candidate_open is None:
+                    candidate_open = {
+                        "startMs": event.timestamp_ms,
+                        "endMs": event.timestamp_ms,
+                        "candidateType": event.candidate_type,
+                        "maxConfidence": event.candidate_confidence,
+                    }
+                else:
+                    candidate_open["endMs"] = event.timestamp_ms
+                    if event.candidate_confidence > candidate_open["maxConfidence"]:
+                        candidate_open["maxConfidence"] = event.candidate_confidence
+                        candidate_open["candidateType"] = event.candidate_type
+            elif candidate_open is not None:
+                candidate_intervals.append(candidate_open)
+                candidate_open = None
+
+            if (
+                event.candidate_type == "speech_attention"
+                and event.speech_probability
+                >= DEFAULT_CONFIG.vad.speech_probability_threshold
+            ):
+                if speech_open is None:
+                    speech_open = {
+                        "startMs": event.timestamp_ms,
+                        "endMs": event.timestamp_ms,
+                        "source": event.speech_source,
+                        "maxProbability": event.speech_probability,
+                    }
+                else:
+                    speech_open["endMs"] = event.timestamp_ms
+                    speech_open["maxProbability"] = max(
+                        speech_open["maxProbability"],
+                        event.speech_probability,
+                    )
+            elif speech_open is not None:
+                speech_intervals.append(speech_open)
+                speech_open = None
+
+        elif isinstance(event, CandidateStartEvent):
+            candidate_events.append(
+                {
+                    "type": event.type,
+                    "timestampMs": event.timestamp_ms,
+                    "candidateId": event.candidate_id,
+                    "candidateType": event.candidate_type,
+                    "confidence": event.candidate_confidence,
+                }
+            )
+        elif isinstance(event, CandidateUpdateEvent):
+            candidate_events.append(
+                {
+                    "type": event.type,
+                    "timestampMs": event.timestamp_ms,
+                    "candidateId": event.candidate_id,
+                    "candidateType": event.candidate_type,
+                    "confidence": event.candidate_confidence,
+                    "shouldCallModel": event.should_call_model,
+                    "state": event.state,
+                }
+            )
         elif isinstance(event, ModelCallEvent):
-            model_calls.append(event.timestamp_ms)
+            model_calls.append(
+                {
+                    "timestampMs": event.timestamp_ms,
+                    "candidateId": event.candidate_id,
+                    "candidateType": event.candidate_type,
+                    "confidence": event.candidate_confidence,
+                    "windowStartMs": event.window_start_ms,
+                    "windowEndMs": event.window_end_ms,
+                }
+            )
+        elif isinstance(event, ModelResultEvent):
+            model_results.append(
+                {
+                    "timestampMs": event.timestamp_ms,
+                    "candidateId": event.candidate_id,
+                    "detectedSoundType": event.analysis.detected_sound_type,
+                    "shouldAlert": event.analysis.should_alert,
+                    "confidence": event.analysis.confidence,
+                    "alertText": event.analysis.alert_text,
+                    "action": event.analysis.action,
+                }
+            )
         elif isinstance(event, AlertStartEvent):
-            alert_starts.append(event.timestamp_ms)
+            alert_starts.append(
+                {
+                    "timestampMs": event.timestamp_ms,
+                    "eventId": event.event_id,
+                    "soundType": event.alert.sound_type,
+                    "confidence": event.alert.confidence,
+                }
+            )
         elif isinstance(event, AlertEndEvent):
-            alert_ends.append(event.timestamp_ms)
+            alert_ends.append(
+                {
+                    "timestampMs": event.timestamp_ms,
+                    "eventId": event.event_id,
+                }
+            )
         elif isinstance(event, ErrorEvent):
             errors.append(event.message)
         elif isinstance(event, SessionDoneEvent):
             duration_ms = event.timestamp_ms
 
-    if candidate_start is not None:
-        candidate_intervals.append((candidate_start, last_candidate_ts or duration_ms))
+    if candidate_open is not None:
+        candidate_intervals.append(candidate_open)
+    if speech_open is not None:
+        speech_intervals.append(speech_open)
 
     return {
-        "file_name": audio_path.name,
-        "clip_id": clip_id,
-        "duration_ms": duration_ms,
-        "candidate_intervals": candidate_intervals,
-        "model_calls": model_calls,
-        "alert_starts": alert_starts,
-        "alert_ends": alert_ends,
-        "alert_count": len(alert_starts),
+        "fileName": audio_path.name,
+        "clipId": clip_id,
+        "durationMs": duration_ms,
+        "candidateIntervals": candidate_intervals,
+        "candidateTimeline": candidate_timeline,
+        "candidateEvents": candidate_events,
+        "vad": {
+            "sileroLoaded": "silero" in vad_sources,
+            "sources": sorted(vad_sources),
+            "speechIntervals": speech_intervals,
+        },
+        "modelCalls": model_calls,
+        "modelResults": model_results,
+        "alertStarts": alert_starts,
+        "alertEnds": alert_ends,
+        "totalAlertsEmitted": len(alert_starts),
+        "warnings": warnings,
         "errors": errors,
     }
 
 
-def format_summary(summary: dict[str, object]) -> list[str]:
-    duration_ms = int(summary["duration_ms"])
+def format_markdown_report(summaries: list[dict[str, Any]]) -> str:
+    lines: list[str] = ["# SoundSight Audio Detection Report", ""]
+
+    if not summaries:
+        lines.extend(["No supported audio files found.", ""])
+
+    for summary in summaries:
+        lines.extend(format_summary(summary))
+        lines.append("")
+
+    return "\n".join(lines).rstrip() + "\n"
+
+
+def format_summary(summary: dict[str, Any]) -> list[str]:
     return [
-        f"## {summary['file_name']}",
+        f"## {summary['fileName']}",
         "",
-        f"- clip id: {summary['clip_id']}",
-        f"- duration: {_format_ms(duration_ms)}",
-        f"- detected candidate intervals: {_format_intervals(summary['candidate_intervals'])}",
-        f"- model_call timestamps: {_format_points(summary['model_calls'])}",
-        f"- alert_start timestamps: {_format_points(summary['alert_starts'])}",
-        f"- alert_end timestamps: {_format_points(summary['alert_ends'])}",
-        f"- final alerts emitted: {summary['alert_count']}",
-        f"- errors: {_format_errors(summary['errors'])}",
+        f"- clip id: {summary['clipId']}",
+        f"- duration: {_format_ms(summary['durationMs'])}",
+        f"- candidate intervals: {_format_intervals(summary['candidateIntervals'])}",
+        f"- candidate timeline: {_format_timeline(summary['candidateTimeline'])}",
+        f"- VAD/speech: {_format_vad(summary['vad'])}",
+        f"- model_call timestamps: {_format_event_points(summary['modelCalls'])}",
+        f"- model_result outputs: {_format_model_results(summary['modelResults'])}",
+        f"- alert_start timestamps: {_format_alert_starts(summary['alertStarts'])}",
+        f"- alert_end timestamps: {_format_event_points(summary['alertEnds'])}",
+        f"- total alerts emitted: {summary['totalAlertsEmitted']}",
+        f"- warnings: {_format_list(summary['warnings'])}",
+        f"- errors: {_format_list(summary['errors'])}",
     ]
 
 
-def _format_ms(value: int) -> str:
-    return f"{value} ms ({value / 1000:.3f} s)"
+def _format_ms(value: int | float) -> str:
+    value_int = int(value)
+    return f"{value_int} ms ({value_int / 1000:.3f} s)"
 
 
-def _format_points(values: object) -> str:
-    points = values if isinstance(values, list) else []
-    if not points:
-        return "none"
-
-    return ", ".join(_format_ms(int(value)) for value in points)
-
-
-def _format_intervals(values: object) -> str:
-    intervals = values if isinstance(values, list) else []
+def _format_intervals(intervals: list[dict[str, Any]]) -> str:
     if not intervals:
         return "none"
 
     return ", ".join(
-        f"{_format_ms(int(start))} to {_format_ms(int(end))}"
-        for start, end in intervals
+        f"{_format_ms(item['startMs'])} to {_format_ms(item['endMs'])}"
+        f" {item.get('candidateType') or 'unknown'}"
+        f" max={float(item.get('maxConfidence', 0.0)):.3f}"
+        for item in intervals
     )
 
 
-def _format_errors(values: object) -> str:
-    errors = values if isinstance(values, list) else []
-    if not errors:
+def _format_timeline(timeline: list[dict[str, Any]]) -> str:
+    if not timeline:
         return "none"
 
-    return "; ".join(str(error) for error in errors)
+    return ", ".join(
+        f"{_format_ms(item['timestampMs'])}:{item.get('candidateType')}"
+        f"({float(item.get('confidence', 0.0)):.3f})"
+        for item in timeline
+    )
+
+
+def _format_vad(vad: dict[str, Any]) -> str:
+    source = ",".join(vad.get("sources", [])) or "none"
+    silero = "yes" if vad.get("sileroLoaded") else "no"
+    intervals = vad.get("speechIntervals", [])
+    if not intervals:
+        return f"Silero loaded={silero}; sources={source}; speech intervals=none"
+
+    formatted = ", ".join(
+        f"{_format_ms(item['startMs'])} to {_format_ms(item['endMs'])}"
+        f" max={float(item.get('maxProbability', 0.0)):.3f}"
+        for item in intervals
+    )
+    return f"Silero loaded={silero}; sources={source}; speech intervals={formatted}"
+
+
+def _format_event_points(events: list[dict[str, Any]]) -> str:
+    if not events:
+        return "none"
+
+    return ", ".join(_format_ms(item["timestampMs"]) for item in events)
+
+
+def _format_model_results(events: list[dict[str, Any]]) -> str:
+    if not events:
+        return "none"
+
+    return ", ".join(
+        f"{_format_ms(item['timestampMs'])}:"
+        f"{item['detectedSoundType']} shouldAlert={item['shouldAlert']}"
+        f" confidence={float(item['confidence']):.3f}"
+        for item in events
+    )
+
+
+def _format_alert_starts(events: list[dict[str, Any]]) -> str:
+    if not events:
+        return "none"
+
+    return ", ".join(
+        f"{_format_ms(item['timestampMs'])}:{item['eventId']}"
+        f" {item['soundType']} confidence={float(item['confidence']):.3f}"
+        for item in events
+    )
+
+
+def _format_list(values: list[str]) -> str:
+    if not values:
+        return "none"
+
+    return "; ".join(values)
 
 
 if __name__ == "__main__":

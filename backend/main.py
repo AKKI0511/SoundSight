@@ -29,16 +29,20 @@ def health() -> dict[str, str]:
 @app.post("/api/demo/stream-events")
 def stream_demo_events(request: StreamEventsRequest) -> StreamingResponse:
     return StreamingResponse(
-        _stream_events(request.clip_id),
+        _stream_events(request),
         media_type="application/x-ndjson",
     )
 
 
-async def _stream_events(clip_id: str) -> AsyncIterator[str]:
+async def _stream_events(request: StreamEventsRequest) -> AsyncIterator[str]:
     session_id = f"demo_{uuid4().hex}"
     elapsed_ms = 0
 
-    for event in iter_streaming_detection_events(clip_id, session_id):
+    async for event in iter_streaming_detection_events(
+        request.clip_id,
+        session_id,
+        language=request.language,
+    ):
         timestamp_ms = _event_timestamp(event)
         await _wait_until(timestamp_ms, elapsed_ms)
         elapsed_ms = max(elapsed_ms, timestamp_ms)
@@ -56,4 +60,4 @@ def _to_ndjson(event: StreamEvent) -> str:
 
 
 def _event_timestamp(event: StreamEvent) -> int:
-    return getattr(event, "timestamp_ms", 0)
+    return int(getattr(event, "timestamp_ms", 0))
