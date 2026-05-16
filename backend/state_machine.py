@@ -5,7 +5,7 @@ from numpy.typing import NDArray
 from audio_loader import FloatArray
 from config import DEFAULT_CONFIG, StateMachineConfig
 from fusion_engine import FusionDecision
-from model_gateway import analyze_candidate_with_gemma4
+from model_gateway import analyze_candidate_with_gemma4, get_model_name, get_model_source
 from schemas import (
     AlertEndEvent,
     AlertStartEvent,
@@ -15,6 +15,7 @@ from schemas import (
     EngineState,
     LanguageCode,
     ModelCallEvent,
+    ModelErrorEvent,
     ModelResultEvent,
     StreamEvent,
 )
@@ -178,9 +179,13 @@ class AlertStateMachine:
         assert decision.candidate_type is not None
 
         self.model_called = True
+        model_source = get_model_source()
+        model_name = get_model_name()
         model_call = ModelCallEvent(
             session_id=self.session_id,
             candidate_id=self.candidate_id,
+            source=model_source,
+            model_name=model_name,
             timestamp_ms=decision.timestamp_ms,
             clip_id=self.clip_id,
             language=self.language,
@@ -198,12 +203,28 @@ class AlertStateMachine:
         model_result = ModelResultEvent(
             session_id=self.session_id,
             candidate_id=self.candidate_id,
+            source=model_source,
+            model_name=model_name,
             timestamp_ms=decision.timestamp_ms,
             clip_id=self.clip_id,
             analysis=analysis,
         )
 
-        events: list[StreamEvent] = [model_call, model_result]
+        events: list[StreamEvent] = [model_call]
+        if analysis.model_error_message:
+            events.append(
+                ModelErrorEvent(
+                    session_id=self.session_id,
+                    candidate_id=self.candidate_id,
+                    source=model_source,
+                    model_name=model_name,
+                    timestamp_ms=decision.timestamp_ms,
+                    clip_id=self.clip_id,
+                    message=analysis.model_error_message,
+                )
+            )
+
+        events.append(model_result)
         if not analysis.should_alert:
             self.state = "COOLDOWN"
             self.quiet_start_ms = decision.timestamp_ms

@@ -24,6 +24,7 @@ const tierPriority: Record<AlertTier, number> = {
   emergency: 3,
   social: 2,
   ambient: 1,
+  none: 0,
 };
 
 export default function Home() {

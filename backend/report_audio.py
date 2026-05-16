@@ -6,6 +6,7 @@ from typing import Any
 from audio_engine import iter_streaming_detection_events
 from audio_loader import canonical_clip_id_for_path, list_supported_audio_files, load_audio_clip
 from config import DEFAULT_CONFIG
+from model_gateway import get_model_name, get_model_source
 from schemas import (
     AlertEndEvent,
     AlertStartEvent,
@@ -14,6 +15,7 @@ from schemas import (
     EngineLogEvent,
     ErrorEvent,
     ModelCallEvent,
+    ModelErrorEvent,
     ModelResultEvent,
     SessionDoneEvent,
 )
@@ -29,6 +31,8 @@ def main() -> None:
     markdown = format_markdown_report(summaries)
     json_payload = {
         "generatedBy": "SoundSight backend audio detection report",
+        "modelSource": get_model_source(),
+        "model": get_model_name(),
         "audioDirectoryCandidates": [
             str(path) for path in DEFAULT_CONFIG.paths.audio_root_candidates
         ],
@@ -65,6 +69,7 @@ async def summarize_audio_file(audio_path: Path, clip_id: str) -> dict[str, Any]
     speech_intervals: list[dict[str, Any]] = []
     model_calls: list[dict[str, Any]] = []
     model_results: list[dict[str, Any]] = []
+    model_errors: list[dict[str, Any]] = []
     alert_starts: list[dict[str, Any]] = []
     alert_ends: list[dict[str, Any]] = []
     candidate_events: list[dict[str, Any]] = []
@@ -145,6 +150,8 @@ async def summarize_audio_file(audio_path: Path, clip_id: str) -> dict[str, Any]
                     "type": event.type,
                     "timestampMs": event.timestamp_ms,
                     "candidateId": event.candidate_id,
+                    "source": event.source,
+                    "model": event.model_name,
                     "candidateType": event.candidate_type,
                     "confidence": event.candidate_confidence,
                 }
@@ -177,11 +184,23 @@ async def summarize_audio_file(audio_path: Path, clip_id: str) -> dict[str, Any]
                 {
                     "timestampMs": event.timestamp_ms,
                     "candidateId": event.candidate_id,
+                    "source": event.source,
+                    "model": event.model_name,
                     "detectedSoundType": event.analysis.detected_sound_type,
                     "shouldAlert": event.analysis.should_alert,
                     "confidence": event.analysis.confidence,
                     "alertText": event.analysis.alert_text,
                     "action": event.analysis.action,
+                }
+            )
+        elif isinstance(event, ModelErrorEvent):
+            model_errors.append(
+                {
+                    "timestampMs": event.timestamp_ms,
+                    "candidateId": event.candidate_id,
+                    "source": event.source,
+                    "model": event.model_name,
+                    "message": event.message,
                 }
             )
         elif isinstance(event, AlertStartEvent):
@@ -224,6 +243,7 @@ async def summarize_audio_file(audio_path: Path, clip_id: str) -> dict[str, Any]
         },
         "modelCalls": model_calls,
         "modelResults": model_results,
+        "modelErrors": model_errors,
         "alertStarts": alert_starts,
         "alertEnds": alert_ends,
         "totalAlertsEmitted": len(alert_starts),
@@ -234,6 +254,13 @@ async def summarize_audio_file(audio_path: Path, clip_id: str) -> dict[str, Any]
 
 def format_markdown_report(summaries: list[dict[str, Any]]) -> str:
     lines: list[str] = ["# SoundSight Audio Detection Report", ""]
+    lines.extend(
+        [
+            f"- model source: {get_model_source()}",
+            f"- model: {get_model_name()}",
+            "",
+        ]
+    )
 
     if not summaries:
         lines.extend(["No supported audio files found.", ""])
@@ -256,6 +283,7 @@ def format_summary(summary: dict[str, Any]) -> list[str]:
         f"- VAD/speech: {_format_vad(summary['vad'])}",
         f"- model_call timestamps: {_format_event_points(summary['modelCalls'])}",
         f"- model_result outputs: {_format_model_results(summary['modelResults'])}",
+        f"- model_error outputs: {_format_model_errors(summary['modelErrors'])}",
         f"- alert_start timestamps: {_format_alert_starts(summary['alertStarts'])}",
         f"- alert_end timestamps: {_format_event_points(summary['alertEnds'])}",
         f"- total alerts emitted: {summary['totalAlertsEmitted']}",
@@ -320,8 +348,20 @@ def _format_model_results(events: list[dict[str, Any]]) -> str:
 
     return ", ".join(
         f"{_format_ms(item['timestampMs'])}:"
-        f"{item['detectedSoundType']} shouldAlert={item['shouldAlert']}"
+        f"{item.get('source', 'dummy')}:{item['detectedSoundType']}"
+        f" shouldAlert={item['shouldAlert']}"
         f" confidence={float(item['confidence']):.3f}"
+        for item in events
+    )
+
+
+def _format_model_errors(events: list[dict[str, Any]]) -> str:
+    if not events:
+        return "none"
+
+    return "; ".join(
+        f"{_format_ms(item['timestampMs'])}:"
+        f"{item.get('source', 'unknown')} {item['message']}"
         for item in events
     )
 

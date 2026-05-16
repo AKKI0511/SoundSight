@@ -1,6 +1,6 @@
 export type LanguageCode = "en" | "hi" | "es";
 
-export type AlertTier = "emergency" | "social" | "ambient";
+export type AlertTier = "emergency" | "social" | "ambient" | "none";
 
 export type IconKey = "siren" | "fire" | "attention" | "door" | "speech";
 
@@ -18,6 +18,16 @@ export type StreamAlert = {
   translations: Record<Exclude<LanguageCode, "en">, AlertTranslation>;
   haptic: string;
   confidence: number;
+};
+
+export type StreamAnalysis = {
+  detectedSoundType: string;
+  tier: AlertTier;
+  alertText: string;
+  action: string;
+  confidence: number;
+  shouldAlert: boolean;
+  alert: StreamAlert;
 };
 
 export type StreamEvent =
@@ -39,6 +49,41 @@ export type StreamEvent =
       sessionId: string;
       eventId: string;
       timestampMs: number;
+    }
+  | {
+      type: "model_call";
+      sessionId: string;
+      candidateId: string;
+      source: "dummy" | "cactus";
+      model?: string | null;
+      timestampMs: number;
+      clipId: string;
+      language: LanguageCode;
+      reason: string;
+      windowStartMs: number;
+      windowEndMs: number;
+      candidateType: string;
+      candidateConfidence: number;
+    }
+  | {
+      type: "model_result";
+      sessionId: string;
+      candidateId: string;
+      source: "dummy" | "cactus";
+      model?: string | null;
+      timestampMs: number;
+      clipId: string;
+      analysis: StreamAnalysis;
+    }
+  | {
+      type: "model_error";
+      sessionId: string;
+      candidateId: string;
+      source: "dummy" | "cactus";
+      model?: string | null;
+      timestampMs: number;
+      clipId: string;
+      message: string;
     }
   | {
       type: "session_done";

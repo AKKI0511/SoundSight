@@ -4,7 +4,18 @@ from pydantic import BaseModel, ConfigDict, Field
 
 
 LanguageCode = Literal["en", "hi", "es"]
-AlertTier = Literal["emergency", "social", "ambient"]
+SoundType = Literal[
+    "emergency_vehicle",
+    "fire_alarm",
+    "door_knock",
+    "attention_outdoors",
+    "addressing_user",
+    "baby_crying",
+    "background_noise",
+    "unknown",
+]
+AlertTier = Literal["emergency", "social", "ambient", "none"]
+ModelSource = Literal["dummy", "cactus"]
 EngineState = Literal["IDLE", "CANDIDATE", "ACTIVE", "COOLDOWN"]
 CandidateType = Literal[
     "fire_alarm",
@@ -30,7 +41,7 @@ class AlertTranslation(ApiModel):
 
 
 class AlertPayload(ApiModel):
-    sound_type: str
+    sound_type: SoundType
     tier: AlertTier
     image_key: str
     alert_text: str
@@ -41,13 +52,18 @@ class AlertPayload(ApiModel):
 
 
 class AlertAnalysis(ApiModel):
-    detected_sound_type: str = Field(alias="detectedSoundType")
+    detected_sound_type: SoundType = Field(alias="detectedSoundType")
     tier: AlertTier
     alert_text: str = Field(alias="alertText")
     action: str
     confidence: float
     should_alert: bool = Field(alias="shouldAlert")
     alert: AlertPayload
+    model_error_message: str | None = Field(
+        default=None,
+        alias="modelErrorMessage",
+        exclude=True,
+    )
 
 
 class SessionStartedEvent(ApiModel):
@@ -110,6 +126,8 @@ class ModelCallEvent(ApiModel):
     type: Literal["model_call"] = "model_call"
     session_id: str = Field(alias="sessionId")
     candidate_id: str = Field(alias="candidateId")
+    source: ModelSource = "dummy"
+    model_name: str | None = Field(default=None, alias="model")
     timestamp_ms: int = Field(alias="timestampMs")
     clip_id: str = Field(alias="clipId")
     language: LanguageCode
@@ -124,9 +142,22 @@ class ModelResultEvent(ApiModel):
     type: Literal["model_result"] = "model_result"
     session_id: str = Field(alias="sessionId")
     candidate_id: str = Field(alias="candidateId")
+    source: ModelSource = "dummy"
+    model_name: str | None = Field(default=None, alias="model")
     timestamp_ms: int = Field(alias="timestampMs")
     clip_id: str = Field(alias="clipId")
     analysis: AlertAnalysis
+
+
+class ModelErrorEvent(ApiModel):
+    type: Literal["model_error"] = "model_error"
+    session_id: str = Field(alias="sessionId")
+    candidate_id: str = Field(alias="candidateId")
+    source: ModelSource = "cactus"
+    model_name: str | None = Field(default=None, alias="model")
+    timestamp_ms: int = Field(alias="timestampMs")
+    clip_id: str = Field(alias="clipId")
+    message: str
 
 
 class AlertStartEvent(ApiModel):
@@ -166,6 +197,7 @@ StreamEvent = (
     | CandidateUpdateEvent
     | ModelCallEvent
     | ModelResultEvent
+    | ModelErrorEvent
     | AlertStartEvent
     | AlertEndEvent
     | SessionDoneEvent

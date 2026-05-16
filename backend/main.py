@@ -1,4 +1,5 @@
 import asyncio
+from contextlib import asynccontextmanager
 from collections.abc import AsyncIterator
 from uuid import uuid4
 
@@ -7,10 +8,19 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 
 from audio_engine import iter_streaming_detection_events
+from model_gateway import shutdown_model_gateway
 from schemas import StreamEvent, StreamEventsRequest
 
 
-app = FastAPI(title="SoundSight Streaming API")
+@asynccontextmanager
+async def lifespan(_: FastAPI):
+    try:
+        yield
+    finally:
+        shutdown_model_gateway()
+
+
+app = FastAPI(title="SoundSight Streaming API", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,

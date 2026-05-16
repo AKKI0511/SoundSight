@@ -1,7 +1,19 @@
+import os
 from typing import Any
 
 from audio_loader import normalize_id
-from schemas import AlertAnalysis, AlertPayload, AlertTranslation, AlertTier, CandidateType
+from schemas import (
+    AlertAnalysis,
+    AlertPayload,
+    AlertTier,
+    AlertTranslation,
+    ModelSource,
+    SoundType,
+)
+
+
+MODEL_MODE_ENV = "SOUNDSIGHT_MODEL_MODE"
+DUMMY_MODEL_NAME = "deterministic_dummy"
 
 
 async def analyze_candidate_with_gemma4(
@@ -9,9 +21,53 @@ async def analyze_candidate_with_gemma4(
     candidate_metadata: dict[str, Any],
     language: str,
 ) -> AlertAnalysis:
-    # TODO: Replace this deterministic dummy output with Gemma 4 via Cactus/Gemini.
+    if get_model_source() == "cactus":
+        try:
+            from cactus_gateway import analyze_candidate_with_cactus
+
+            result = await analyze_candidate_with_cactus(
+                candidate_window,
+                candidate_metadata,
+                language,
+            )
+            return result.analysis
+        except Exception as exc:
+            return _safe_no_alert_analysis(
+                "Cactus gateway failed before model execution: "
+                f"{str(exc).replace(chr(10), ' ')}"
+            )
+
     del candidate_window, language
     return deterministic_dummy_alert(candidate_metadata)
+
+
+def get_model_source() -> ModelSource:
+    mode = os.getenv(MODEL_MODE_ENV, "dummy").strip().lower()
+    return "cactus" if mode == "cactus" else "dummy"
+
+
+def get_model_name() -> str:
+    if get_model_source() == "cactus":
+        try:
+            from cactus_gateway import get_cactus_model_label
+
+            return get_cactus_model_label()
+        except Exception:
+            return os.getenv("SOUNDSIGHT_CACTUS_MODEL_PATH") or os.getenv(
+                "SOUNDSIGHT_CACTUS_MODEL",
+                "google/gemma-4-E2B-it",
+            )
+
+    return DUMMY_MODEL_NAME
+
+
+def shutdown_model_gateway() -> None:
+    try:
+        from cactus_gateway import destroy_cactus_model
+    except Exception:
+        return
+
+    destroy_cactus_model()
 
 
 def deterministic_dummy_alert(candidate_metadata: dict[str, Any]) -> AlertAnalysis:
@@ -76,7 +132,7 @@ def _analysis(alert: AlertPayload, *, should_alert: bool) -> AlertAnalysis:
 
 def _payload(
     *,
-    sound_type: str,
+    sound_type: SoundType,
     tier: AlertTier,
     image_key: str,
     alert_text: str,
@@ -157,7 +213,7 @@ ALERT_PAYLOADS: dict[str, AlertPayload] = {
         confidence=0.9,
     ),
     "indoor_address": _payload(
-        sound_type="indoor_address",
+        sound_type="addressing_user",
         tier="social",
         image_key="indoor_address",
         alert_text="Someone may be speaking to you.",
@@ -170,3 +226,35 @@ ALERT_PAYLOADS: dict[str, AlertPayload] = {
         confidence=0.86,
     ),
 }
+
+
+def _safe_no_alert_analysis(error_message: str) -> AlertAnalysis:
+    alert = AlertPayload(
+        sound_type="unknown",
+        tier="none",
+        image_key="unknown",
+        alert_text="No important sound detected.",
+        action="No action needed.",
+        translations={
+            "hi": AlertTranslation(
+                alert_text="\u0915\u094b\u0908 \u092e\u0939\u0924\u094d\u0935\u092a\u0942\u0930\u094d\u0923 \u0927\u094d\u0935\u0928\u093f \u0928\u0939\u0940\u0902 \u092e\u093f\u0932\u0940\u0964",
+                action="\u0915\u094b\u0908 \u0915\u093e\u0930\u094d\u0930\u0935\u093e\u0908 \u091c\u0930\u0942\u0930\u0940 \u0928\u0939\u0940\u0902\u0964",
+            ),
+            "es": AlertTranslation(
+                alert_text="No se detecto sonido importante.",
+                action="No se necesita accion.",
+            ),
+        },
+        haptic="None",
+        confidence=0.0,
+    )
+    return AlertAnalysis(
+        detected_sound_type=alert.sound_type,
+        tier=alert.tier,
+        alert_text=alert.alert_text,
+        action=alert.action,
+        confidence=alert.confidence,
+        should_alert=False,
+        alert=alert,
+        model_error_message=error_message,
+    )
