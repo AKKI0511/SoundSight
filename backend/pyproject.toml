@@ -4,12 +4,14 @@ version = "0.1.0"
 description = "Add your description here"
 requires-python = ">=3.12"
 dependencies = [
+    "av>=17.0.1",
     "fastapi>=0.136.1",
     "librosa>=0.11.0",
     "miniaudio>=1.71",
     "numpy>=2.4.5",
     "pydantic>=2.13.4",
     "pydub>=0.25.1",
+    "python-multipart>=0.0.28",
     "scipy>=1.17.1",
     "soundfile>=0.13.1",
     "uvicorn>=0.47.0",

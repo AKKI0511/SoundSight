@@ -1,5 +1,5 @@
 import { DemoMode } from "@/components/DemoMode";
 
-export default function Home() {
+export default function DemoPage() {
   return <DemoMode />;
 }

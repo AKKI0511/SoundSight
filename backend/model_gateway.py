@@ -32,7 +32,7 @@ async def analyze_candidate_with_gemma4(
             )
             return result.analysis
         except Exception as exc:
-            return _safe_no_alert_analysis(
+            return safe_no_alert_analysis(
                 "Cactus gateway failed before model execution: "
                 f"{str(exc).replace(chr(10), ' ')}"
             )
@@ -228,7 +228,7 @@ ALERT_PAYLOADS: dict[str, AlertPayload] = {
 }
 
 
-def _safe_no_alert_analysis(error_message: str) -> AlertAnalysis:
+def safe_no_alert_analysis(error_message: str) -> AlertAnalysis:
     alert = AlertPayload(
         sound_type="unknown",
         tier="none",

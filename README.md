@@ -4,11 +4,73 @@ A mobile-first local AI app for Deaf and hard-of-hearing users that listens for 
 
 ## Project Layout
 
-- `frontend/`: Next.js TypeScript UI and phone emulator.
+- `frontend/`: Next.js TypeScript UI.
 - `backend/`: FastAPI Python backend managed with `uv`.
 - `supporting-data-images-audio/`: demo audio and image assets.
 
-## Frontend Setup
+## Modes
+
+### Demo Mode
+
+Demo mode is available at `/` and `/demo`. It keeps the existing clip picker interface, plays local demo audio clips, and streams backend events from:
+
+```http
+POST /api/demo/stream-events
+```
+
+The frontend displays the alert payloads returned by the backend. Local hardcoded fallback alert schedules are not used.
+
+### Live Mode
+
+Live mode is available at `/live`. It requests browser microphone permission and uses `MediaRecorder`/`getUserMedia` to capture overlapping audio windows:
+
+- each window records about 4 seconds of microphone audio
+- a new window starts every 2 seconds while listening
+- each completed window is uploaded as `multipart/form-data`
+- the backend decides whether detector results should call the model
+
+Live mode is not raw WebSocket streaming, WebRTC, or continuous frontend model calling yet.
+
+Live windows are sent to:
+
+```http
+POST /api/live/process-window
+Content-Type: multipart/form-data
+
+audio=<file/blob>
+language=en|hi|es
+sessionId=<optional>
+```
+
+The endpoint returns NDJSON using the same event schema as Demo mode, including `session_started`, `engine_log`, `model_call`, `model_result`, `alert_start`, `alert_end`, `model_error`, and `session_done`.
+
+## Run Locally
+
+### Backend
+
+Install dependencies:
+
+```bash
+cd backend
+uv sync
+```
+
+Run in deterministic dummy mode on macOS/Linux:
+
+```bash
+uv run uvicorn main:app --reload --port 8000
+```
+
+Run in deterministic dummy mode on Windows PowerShell:
+
+```powershell
+cd backend
+uv run uvicorn main:app --reload --port 8000
+```
+
+Dummy mode is the default when `SOUNDSIGHT_MODEL_MODE` is unset.
+
+### Frontend
 
 ```bash
 cd frontend
@@ -16,37 +78,52 @@ npm install
 npm run dev
 ```
 
-The frontend expects the backend at `http://localhost:8000` by default. To change it:
+The frontend expects the backend at `http://localhost:8000`. To change it:
 
 ```bash
 NEXT_PUBLIC_SOUNDSIGHT_API_URL=http://localhost:8000 npm run dev
 ```
 
-## Backend Setup
+Open:
+
+- Demo: `http://localhost:3000/` or `http://localhost:3000/demo`
+- Live: `http://localhost:3000/live`
+
+## Test Live Mode In Dummy Mode
+
+1. Start the backend in dummy mode.
+2. Start the frontend.
+3. Open `http://localhost:3000/live`.
+4. Click `Start Listening`.
+5. Allow microphone permission.
+6. Play or make a detectable sound near the microphone.
+7. Confirm the live screen shows backend-generated alerts and clears when `alert_end` arrives.
+
+You can also test the live endpoint with a known demo file:
 
 ```bash
 cd backend
-uv sync
+curl -N \
+  -F "audio=@../supporting-data-images-audio/audio-clips/fire-alarm-414915.mp3" \
+  -F "language=en" \
+  http://localhost:8000/api/live/process-window
 ```
 
-Run the backend in deterministic dummy mode:
+## Model Modes
+
+SoundSight uses one model mode variable:
 
 ```bash
-SOUNDSIGHT_MODEL_MODE=dummy uv run uvicorn main:app --reload --port 8000
+SOUNDSIGHT_MODEL_MODE=dummy | cactus
 ```
 
-On Windows PowerShell:
+### Dummy Mode
 
-```powershell
-$env:SOUNDSIGHT_MODEL_MODE="dummy"
-uv run uvicorn main:app --reload --port 8000
-```
+Dummy mode is deterministic, works on Windows, and keeps all dummy alert payloads centralized in `backend/model_gateway.py`.
 
-Dummy mode is the default when `SOUNDSIGHT_MODEL_MODE` is unset.
+### Cactus Mode
 
-## Cactus/Gemma 4 Mode
-
-Cactus mode uses the official Cactus Python FFI bindings and Gemma 4 native audio support. It is expected to be tested on macOS or Linux, not native Windows.
+Cactus mode is intended for macOS/Linux testing with the Cactus Python FFI bindings and Gemma 4 native audio support. It is not expected to run on native Windows.
 
 Official Cactus references:
 
@@ -54,7 +131,7 @@ Official Cactus references:
 - [Cactus Quickstart](https://docs.cactuscompute.com/latest/docs/quickstart/)
 - [Gemma 4 on Cactus](https://docs.cactuscompute.com/latest/blog/gemma4/)
 
-Install and build Cactus from source:
+Example setup:
 
 ```bash
 git clone https://github.com/cactus-compute/cactus ~/cactus
@@ -64,119 +141,30 @@ cactus build --python
 cactus download google/gemma-4-E2B-it
 ```
 
-Linux may also need the packages listed by Cactus:
+Linux may also need:
 
 ```bash
 sudo apt-get install python3 python3-venv python3-pip cmake build-essential libcurl4-openssl-dev
 ```
 
-Required SoundSight environment variables for Cactus mode:
-
-```bash
-export SOUNDSIGHT_MODEL_MODE=cactus
-export SOUNDSIGHT_CACTUS_REPO="$HOME/cactus"
-export SOUNDSIGHT_CACTUS_MODEL="google/gemma-4-E2B-it"
-export SOUNDSIGHT_CACTUS_MODEL_PATH="$HOME/cactus/weights/gemma-4-e2b-it"
-```
-
-`SOUNDSIGHT_CACTUS_MODEL_PATH` can be omitted if the Cactus `src.downloads.ensure_model` helper is available; SoundSight will try to resolve/download `SOUNDSIGHT_CACTUS_MODEL`.
-
-Optional Cactus variables:
-
-- `SOUNDSIGHT_CACTUS_MODEL`: defaults to `google/gemma-4-E2B-it`.
-- `SOUNDSIGHT_CACTUS_MODEL_PATH`: local weights directory, preferred for predictable startup.
-- `SOUNDSIGHT_CACTUS_REPO`: Cactus checkout path; SoundSight adds `<repo>/python` to `sys.path`.
-
-## Smoke Test Cactus Audio
-
-From `backend/` on macOS/Linux:
-
-```bash
-uv sync
-export SOUNDSIGHT_MODEL_MODE=cactus
-export SOUNDSIGHT_CACTUS_REPO="$HOME/cactus"
-export SOUNDSIGHT_CACTUS_MODEL="google/gemma-4-E2B-it"
-export SOUNDSIGHT_CACTUS_MODEL_PATH="$HOME/cactus/weights/gemma-4-e2b-it"
-uv run python smoke_test_cactus_audio.py
-```
-
-The smoke test loads a demo fire-alarm clip, calls Cactus/Gemma 4 once, prints the raw Cactus envelope, prints the raw model response, prints parsed JSON, and ends with `PASS` or `FAIL`.
-
-## Run Backend And Frontend Together
-
-Terminal 1:
+Run SoundSight with Cactus:
 
 ```bash
 cd backend
-SOUNDSIGHT_MODEL_MODE=cactus \
-SOUNDSIGHT_CACTUS_REPO="$HOME/cactus" \
-SOUNDSIGHT_CACTUS_MODEL_PATH="$HOME/cactus/weights/gemma-4-e2b-it" \
+export SOUNDSIGHT_MODEL_MODE=cactus
+export SOUNDSIGHT_CACTUS_REPO="$HOME/cactus"
+export SOUNDSIGHT_CACTUS_MODEL="google/gemma-4-E2B-it"
+export SOUNDSIGHT_CACTUS_MODEL_PATH="$HOME/cactus/weights/gemma-4-e2b-it"
 uv run uvicorn main:app --reload --port 8000
 ```
 
-Terminal 2:
+`SOUNDSIGHT_CACTUS_MODEL_PATH` can be omitted if the Cactus `src.downloads.ensure_model` helper is available.
+
+To verify Cactus integration on macOS/Linux:
 
 ```bash
-cd frontend
-npm run dev
+cd backend
+uv run python smoke_test_cactus_audio.py
 ```
 
-Open the frontend, play a demo clip, and watch the phone emulator.
-
-To verify the UI is using real Cactus output:
-
-1. Open browser DevTools and inspect the `POST /api/demo/stream-events` response.
-2. Confirm the NDJSON stream contains `model_call` with `"source":"cactus"`.
-3. Confirm the stream contains `model_result` with `"source":"cactus"` and a parsed `analysis.alert`.
-4. Confirm the following `alert_start.alert.alert_text` matches the cue shown in the phone emulator.
-
-You can also inspect the stream directly:
-
-```bash
-curl -N \
-  -H "Content-Type: application/json" \
-  -H "Accept: application/x-ndjson" \
-  -d '{"clipId":"fire_alarm","language":"en"}' \
-  http://localhost:8000/api/demo/stream-events
-```
-
-## Audio Report
-
-Run the detector report in dummy mode:
-
-```bash
-SOUNDSIGHT_MODEL_MODE=dummy uv run python report_audio.py
-```
-
-Run the detector report in Cactus mode:
-
-```bash
-SOUNDSIGHT_MODEL_MODE=cactus \
-SOUNDSIGHT_CACTUS_REPO="$HOME/cactus" \
-SOUNDSIGHT_CACTUS_MODEL_PATH="$HOME/cactus/weights/gemma-4-e2b-it" \
-uv run python report_audio.py
-```
-
-The report includes model source, model name/path, model calls, model results, and model errors.
-
-## Streaming API
-
-The main endpoint is unchanged:
-
-```http
-POST /api/demo/stream-events
-Accept: application/x-ndjson
-Content-Type: application/json
-
-{"clipId":"fire_alarm","language":"en"}
-```
-
-The stream may include:
-
-- `model_call`
-- `model_result`
-- `model_error`
-- `alert_start`
-- `alert_end`
-
-In explicit Cactus mode, Cactus import/runtime/parser failures emit `model_error` and a safe no-alert `model_result`; SoundSight does not silently replace failed Cactus calls with dummy alerts.
+Then run Demo or Live and inspect the NDJSON stream for `model_call` and `model_result` events with `"source":"cactus"`.

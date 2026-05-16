@@ -11,7 +11,7 @@ class AudioConfig:
     step_ms: int = 500
     window_ms: int = 4_000
     supported_extensions: frozenset[str] = frozenset(
-        {".mp3", ".wav", ".m4a", ".flac", ".ogg"}
+        {".aac", ".flac", ".m4a", ".mp3", ".mp4", ".ogg", ".opus", ".wav", ".webm"}
     )
 
 

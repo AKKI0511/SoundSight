@@ -1,16 +1,21 @@
 import {
-  getDemoClip,
   type LanguageCode,
-  type ScheduledAlert,
   type StreamEvent,
 } from "@/lib/demo-alerts";
 
-type StreamEventsOptions = {
+type DemoStreamEventsOptions = {
   clipId: string;
   language: LanguageCode;
   signal: AbortSignal;
   onEvent: (event: StreamEvent) => void;
-  allowFallback?: boolean;
+};
+
+type LiveWindowEventsOptions = {
+  audio: Blob;
+  language: LanguageCode;
+  sessionId: string;
+  signal: AbortSignal;
+  onEvent: (event: StreamEvent) => void;
 };
 
 const API_BASE_URL =
@@ -18,21 +23,33 @@ const API_BASE_URL =
 const BACKEND_CONNECT_TIMEOUT_MS = 1200;
 
 export async function streamDemoEvents(
-  options: StreamEventsOptions,
+  options: DemoStreamEventsOptions,
 ): Promise<void> {
-  try {
-    await streamBackendEvents(options);
-  } catch (error) {
-    if (options.signal.aborted || isAbortError(error)) {
-      throw error;
-    }
+  await streamBackendEvents(options);
+}
 
-    if (options.allowFallback === false) {
-      throw error;
-    }
+export async function streamLiveWindowEvents({
+  audio,
+  language,
+  sessionId,
+  signal,
+  onEvent,
+}: LiveWindowEventsOptions): Promise<void> {
+  const formData = new FormData();
+  formData.append("audio", audio, liveWindowFileName(audio.type));
+  formData.append("language", language);
+  formData.append("sessionId", sessionId);
 
-    await streamLocalFallbackEvents(options);
-  }
+  const response = await fetch(`${API_BASE_URL}/api/live/process-window`, {
+    method: "POST",
+    headers: {
+      Accept: "application/x-ndjson",
+    },
+    body: formData,
+    signal,
+  });
+
+  await readNdjsonResponse(response, onEvent);
 }
 
 async function streamBackendEvents({
@@ -40,7 +57,7 @@ async function streamBackendEvents({
   language,
   signal,
   onEvent,
-}: StreamEventsOptions): Promise<void> {
+}: DemoStreamEventsOptions): Promise<void> {
   const backendAbort = createBackendAbort(signal);
   let response: Response;
 
@@ -69,8 +86,22 @@ async function streamBackendEvents({
     throw new Error(`Stream request failed with ${response.status}`);
   }
 
-  if (!response.body) {
+  try {
+    await readNdjsonResponse(response, onEvent);
+  } finally {
     backendAbort.cleanup();
+  }
+}
+
+async function readNdjsonResponse(
+  response: Response,
+  onEvent: (event: StreamEvent) => void,
+): Promise<void> {
+  if (!response.ok) {
+    throw new Error(`Stream request failed with ${response.status}`);
+  }
+
+  if (!response.body) {
     throw new Error("Stream response did not include a body");
   }
 
@@ -99,66 +130,7 @@ async function streamBackendEvents({
     emitNdjsonLine(buffer, onEvent);
   } finally {
     reader.releaseLock();
-    backendAbort.cleanup();
   }
-}
-
-async function streamLocalFallbackEvents({
-  clipId,
-  signal,
-  onEvent,
-}: StreamEventsOptions): Promise<void> {
-  const clip = getDemoClip(clipId);
-
-  if (!clip) {
-    throw new Error(`Unknown fallback clip: ${clipId}`);
-  }
-
-  const sessionId = `local_${getSessionToken()}`;
-  let elapsedMs = 0;
-
-  onEvent({
-    type: "session_started",
-    sessionId,
-    clipId,
-    timestampMs: 0,
-  });
-
-  for (const scheduledAlert of clip.localSchedule.alerts) {
-    await waitUntil(scheduledAlert.startMs, elapsedMs, signal);
-    elapsedMs = scheduledAlert.startMs;
-    emitLocalAlertStart(sessionId, scheduledAlert, onEvent);
-
-    await waitUntil(scheduledAlert.endMs, elapsedMs, signal);
-    elapsedMs = scheduledAlert.endMs;
-    onEvent({
-      type: "alert_end",
-      sessionId,
-      eventId: scheduledAlert.eventId,
-      timestampMs: scheduledAlert.endMs,
-    });
-  }
-
-  await waitUntil(clip.localSchedule.doneMs, elapsedMs, signal);
-  onEvent({
-    type: "session_done",
-    sessionId,
-    timestampMs: clip.localSchedule.doneMs,
-  });
-}
-
-function emitLocalAlertStart(
-  sessionId: string,
-  scheduledAlert: ScheduledAlert,
-  onEvent: (event: StreamEvent) => void,
-) {
-  onEvent({
-    type: "alert_start",
-    sessionId,
-    eventId: scheduledAlert.eventId,
-    timestampMs: scheduledAlert.startMs,
-    alert: scheduledAlert.alert,
-  });
 }
 
 function emitNdjsonLine(
@@ -172,47 +144,6 @@ function emitNdjsonLine(
   }
 
   onEvent(JSON.parse(trimmedLine) as StreamEvent);
-}
-
-function waitUntil(
-  targetMs: number,
-  elapsedMs: number,
-  signal: AbortSignal,
-): Promise<void> {
-  return wait(Math.max(0, targetMs - elapsedMs), signal);
-}
-
-function wait(ms: number, signal: AbortSignal): Promise<void> {
-  return new Promise((resolve, reject) => {
-    if (signal.aborted) {
-      reject(createAbortError());
-      return;
-    }
-
-    const timeoutId = window.setTimeout(() => {
-      signal.removeEventListener("abort", abort);
-      resolve();
-    }, ms);
-
-    function abort() {
-      window.clearTimeout(timeoutId);
-      reject(createAbortError());
-    }
-
-    signal.addEventListener("abort", abort, { once: true });
-  });
-}
-
-function isAbortError(error: unknown): boolean {
-  return error instanceof DOMException && error.name === "AbortError";
-}
-
-function createAbortError(): DOMException {
-  return new DOMException("Stream aborted", "AbortError");
-}
-
-function getSessionToken(): string {
-  return globalThis.crypto?.randomUUID?.() ?? String(Date.now());
 }
 
 function createBackendAbort(signal: AbortSignal) {
@@ -243,7 +174,23 @@ function createBackendAbort(signal: AbortSignal) {
 
 class BackendUnavailableError extends Error {
   constructor() {
-    super("Backend stream did not respond before fallback timeout");
+    super("Backend stream did not respond before connection timeout");
     this.name = "BackendUnavailableError";
   }
+}
+
+function liveWindowFileName(mimeType: string): string {
+  if (mimeType.includes("mp4")) {
+    return "live-window.mp4";
+  }
+
+  if (mimeType.includes("ogg") || mimeType.includes("opus")) {
+    return "live-window.ogg";
+  }
+
+  if (mimeType.includes("wav")) {
+    return "live-window.wav";
+  }
+
+  return "live-window.webm";
 }

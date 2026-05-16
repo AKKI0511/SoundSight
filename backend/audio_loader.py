@@ -82,6 +82,9 @@ def load_audio_clip(
         samples = _decode_with_librosa(path, audio_config.sample_rate, errors)
 
     if samples is None:
+        samples = _decode_with_av(path, audio_config.sample_rate, errors)
+
+    if samples is None:
         samples = _decode_with_pydub(path, audio_config.sample_rate, errors)
 
     if samples is None:
@@ -203,6 +206,60 @@ def _decode_with_librosa(path: Path, sample_rate: int, errors: list[str]) -> Flo
     except Exception as exc:
         errors.append(f"librosa: {exc}")
         return None
+
+
+def _decode_with_av(path: Path, sample_rate: int, errors: list[str]) -> FloatArray | None:
+    try:
+        import av
+        from av.audio.resampler import AudioResampler
+
+        chunks: list[FloatArray] = []
+        with av.open(str(path)) as container:
+            audio_stream = next(
+                (stream for stream in container.streams if stream.type == "audio"),
+                None,
+            )
+            if audio_stream is None:
+                raise ValueError("no audio stream found")
+
+            resampler = AudioResampler(format="flt", layout="mono", rate=sample_rate)
+            for frame in container.decode(audio_stream):
+                for resampled_frame in _iter_av_frames(resampler.resample(frame)):
+                    chunks.append(_av_frame_to_mono_float(resampled_frame))
+
+            try:
+                flushed_frames = resampler.resample(None)
+            except Exception:
+                flushed_frames = []
+
+            for resampled_frame in _iter_av_frames(flushed_frames):
+                chunks.append(_av_frame_to_mono_float(resampled_frame))
+
+        if not chunks:
+            raise ValueError("no decoded audio frames")
+
+        return np.concatenate(chunks).astype(np.float32, copy=False)
+    except Exception as exc:
+        errors.append(f"av: {exc}")
+        return None
+
+
+def _iter_av_frames(frames: object) -> tuple[object, ...]:
+    if frames is None:
+        return ()
+    if isinstance(frames, list):
+        return tuple(frames)
+    return (frames,)
+
+
+def _av_frame_to_mono_float(frame: object) -> FloatArray:
+    samples = np.asarray(frame.to_ndarray(), dtype=np.float32)
+    if samples.ndim == 2:
+        if samples.shape[0] == 1:
+            samples = samples[0]
+        else:
+            samples = np.mean(samples, axis=0, dtype=np.float32)
+    return samples.reshape(-1).astype(np.float32, copy=False)
 
 
 def _decode_with_pydub(path: Path, sample_rate: int, errors: list[str]) -> FloatArray | None:

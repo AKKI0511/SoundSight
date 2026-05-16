@@ -17,6 +17,7 @@ import numpy as np
 from pydantic import BaseModel, Field, ValidationError, field_validator
 
 from config import DEFAULT_CONFIG
+from model_gateway import safe_no_alert_analysis
 from schemas import AlertAnalysis, AlertPayload, AlertTranslation, AlertTier, SoundType
 
 
@@ -125,7 +126,7 @@ def _analyze_candidate_with_cactus_sync(
     except Exception as exc:
         message = _format_error(exc)
         return CactusGatewayResult(
-            analysis=_safe_no_alert_analysis(message),
+            analysis=safe_no_alert_analysis(message),
             error_message=message,
         )
     finally:
@@ -280,7 +281,7 @@ def _result_from_cactus_completion(raw_result_json: str) -> CactusGatewayResult:
     except json.JSONDecodeError as exc:
         message = f"Cactus returned non-JSON completion envelope: {exc}"
         return CactusGatewayResult(
-            analysis=_safe_no_alert_analysis(message),
+            analysis=safe_no_alert_analysis(message),
             raw_result_json=raw_result_json,
             error_message=message,
         )
@@ -288,7 +289,7 @@ def _result_from_cactus_completion(raw_result_json: str) -> CactusGatewayResult:
     if result.get("success") is False:
         message = f"Cactus completion failed: {result.get('error') or 'unknown error'}"
         return CactusGatewayResult(
-            analysis=_safe_no_alert_analysis(message),
+            analysis=safe_no_alert_analysis(message),
             raw_result_json=raw_result_json,
             raw_response=_string_or_none(result.get("response")),
             error_message=message,
@@ -298,7 +299,7 @@ def _result_from_cactus_completion(raw_result_json: str) -> CactusGatewayResult:
     if not raw_response:
         message = "Cactus completion did not include a response field."
         return CactusGatewayResult(
-            analysis=_safe_no_alert_analysis(message),
+            analysis=safe_no_alert_analysis(message),
             raw_result_json=raw_result_json,
             error_message=message,
         )
@@ -309,7 +310,7 @@ def _result_from_cactus_completion(raw_result_json: str) -> CactusGatewayResult:
     except (ValueError, ValidationError) as exc:
         message = f"Cactus response did not validate as alert JSON: {_format_error(exc)}"
         return CactusGatewayResult(
-            analysis=_safe_no_alert_analysis(message),
+            analysis=safe_no_alert_analysis(message),
             raw_result_json=raw_result_json,
             raw_response=raw_response,
             error_message=message,
@@ -395,38 +396,6 @@ def _analysis_from_cactus_alert(alert_json: CactusAlertJson) -> AlertAnalysis:
         confidence=alert.confidence,
         should_alert=alert_json.should_alert,
         alert=alert,
-    )
-
-
-def _safe_no_alert_analysis(error_message: str) -> AlertAnalysis:
-    alert = AlertPayload(
-        sound_type="unknown",
-        tier="none",
-        image_key="unknown",
-        alert_text="No important sound detected.",
-        action="No action needed.",
-        translations={
-            "hi": AlertTranslation(
-                alert_text="\u0915\u094b\u0908 \u092e\u0939\u0924\u094d\u0935\u092a\u0942\u0930\u094d\u0923 \u0927\u094d\u0935\u0928\u093f \u0928\u0939\u0940\u0902 \u092e\u093f\u0932\u0940\u0964",
-                action="\u0915\u094b\u0908 \u0915\u093e\u0930\u094d\u0930\u0935\u093e\u0908 \u091c\u0930\u0942\u0930\u0940 \u0928\u0939\u0940\u0902\u0964",
-            ),
-            "es": AlertTranslation(
-                alert_text="No se detecto sonido importante.",
-                action="No se necesita accion.",
-            ),
-        },
-        haptic="None",
-        confidence=0.0,
-    )
-    return AlertAnalysis(
-        detected_sound_type=alert.sound_type,
-        tier=alert.tier,
-        alert_text=alert.alert_text,
-        action=alert.action,
-        confidence=alert.confidence,
-        should_alert=False,
-        alert=alert,
-        model_error_message=error_message,
     )
 
 

@@ -13,9 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "SoundSight Demo Clips",
+  title: "SoundSight",
   description:
-    "A deterministic SoundSight frontend demo for visual sound alerts.",
+    "A local SoundSight app for demo clips and chunked live microphone alerts.",
 };
 
 export default function RootLayout({
