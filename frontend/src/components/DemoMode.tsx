@@ -2,8 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ClipSelector } from "@/components/ClipSelector";
-import { LanguageSelector } from "@/components/LanguageSelector";
-import { ModeNav } from "@/components/ModeNav";
+import { GlobalNav } from "@/components/GlobalNav";
 import { PhoneEmulator } from "@/components/PhoneEmulator";
 import {
   demoClips,
@@ -222,7 +221,7 @@ export function DemoMode() {
   }, []);
 
   return (
-    <main className="h-dvh overflow-hidden bg-[#030507] text-white lg:min-h-screen">
+    <main className="flex h-dvh flex-col overflow-hidden bg-[#030507] text-white lg:min-h-screen">
       <audio
         ref={audioRef}
         preload="metadata"
@@ -245,20 +244,10 @@ export function DemoMode() {
         }}
       />
 
-      <div className="flex h-full w-full min-w-0 max-w-full flex-col overflow-hidden lg:mx-auto lg:min-h-screen lg:max-w-6xl lg:px-8 lg:py-8">
-        <header className="hidden items-center justify-between gap-4 lg:flex">
-          <div className="text-sm font-semibold uppercase tracking-[0.24em] text-cyan-100">
-            SoundSight
-          </div>
-          <ModeNav />
-          <LanguageSelector value={language} onChange={setLanguage} />
-        </header>
+      <GlobalNav language={language} onLanguageChange={setLanguage} />
 
+      <div className="flex min-h-0 w-full min-w-0 max-w-full flex-1 flex-col overflow-hidden lg:mx-auto lg:max-w-6xl lg:px-8 lg:pb-8 lg:pt-6">
         <div className="w-full max-w-full min-w-0 shrink-0 space-y-2 overflow-hidden px-3 pb-3 pt-3 lg:hidden">
-          <div className="flex min-w-0 items-center justify-between gap-3">
-            <ModeNav />
-            <LanguageSelector value={language} onChange={setLanguage} />
-          </div>
           <ClipSelector
             clips={demoClips}
             selectedClipId={selectedClip.id}

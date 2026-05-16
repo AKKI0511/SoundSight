@@ -1,9 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { LanguageSelector } from "@/components/LanguageSelector";
+import { GlobalNav } from "@/components/GlobalNav";
 import { MinimalAlert } from "@/components/MinimalAlert";
-import { ModeNav } from "@/components/ModeNav";
 import {
   alertKey,
   chooseVisibleAlert,
@@ -37,6 +36,7 @@ export function LiveMode() {
   const [language, setLanguage] = useState<LanguageCode>("en");
   const [isListening, setIsListening] = useState(false);
   const [micBlocked, setMicBlocked] = useState(false);
+  const [meterStream, setMeterStream] = useState<MediaStream | null>(null);
   const [processingCount, setProcessingCount] = useState(0);
   const [activeAlerts, setActiveAlerts] = useState<ActiveAlert[]>([]);
 
@@ -195,6 +195,7 @@ export function LiveMode() {
   const stopLiveSession = useCallback(() => {
     runIdRef.current += 1;
     startPendingRef.current = false;
+    setMeterStream(null);
 
     if (intervalIdRef.current !== null) {
       window.clearInterval(intervalIdRef.current);
@@ -258,6 +259,7 @@ export function LiveMode() {
     } catch {
       startPendingRef.current = false;
       setMicBlocked(true);
+      setMeterStream(null);
       setIsListening(false);
       return;
     }
@@ -266,6 +268,7 @@ export function LiveMode() {
     runIdRef.current = runId;
     streamRef.current = stream;
     setIsListening(true);
+    setMeterStream(stream);
     startPendingRef.current = false;
 
     startRecorderWindow(runId);
@@ -281,31 +284,28 @@ export function LiveMode() {
   }, [stopLiveSession]);
 
   return (
-    <main className="relative h-dvh overflow-hidden bg-[#030507] text-white">
-      <header className="pointer-events-none absolute inset-x-0 top-0 z-20 flex items-start justify-between gap-3 p-3 sm:p-5">
-        <div className="pointer-events-auto hidden text-sm font-semibold uppercase tracking-[0.24em] text-cyan-100 sm:block">
-          SoundSight
-        </div>
-        <div className="pointer-events-auto mx-auto sm:absolute sm:left-1/2 sm:-translate-x-1/2">
-          <ModeNav />
-        </div>
-        <div className="pointer-events-auto">
-          <LanguageSelector value={language} onChange={setLanguage} />
-        </div>
-      </header>
+    <main className="relative flex h-dvh flex-col overflow-hidden bg-[#030507] text-white">
+      <GlobalNav language={language} onLanguageChange={setLanguage} />
 
-      <section className="flex h-full w-full items-center justify-center">
+      <section className="flex min-h-0 w-full flex-1 items-center justify-center">
         {visibleAlert ? (
           <MinimalAlert alert={visibleAlert} language={language} />
         ) : null}
       </section>
 
-      {statusLabel ? (
-        <div
-          className="absolute bottom-24 left-1/2 z-20 -translate-x-1/2 text-xs font-semibold uppercase tracking-[0.24em] text-slate-500"
-          aria-live="polite"
-        >
-          {statusLabel}
+      {isListening || statusLabel ? (
+        <div className="absolute bottom-24 left-1/2 z-20 flex -translate-x-1/2 flex-col items-center gap-2">
+          {isListening && !micBlocked && meterStream ? (
+            <MicLevelMeter stream={meterStream} />
+          ) : null}
+          {statusLabel ? (
+            <div
+              className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500"
+              aria-live="polite"
+            >
+              {statusLabel}
+            </div>
+          ) : null}
         </div>
       ) : null}
 
@@ -317,6 +317,108 @@ export function LiveMode() {
         {isListening ? "Stop Listening" : "Start Listening"}
       </button>
     </main>
+  );
+}
+
+const micLevelBarWeights = [0.45, 0.75, 1, 0.7, 0.5];
+
+function MicLevelMeter({ stream }: { stream: MediaStream }) {
+  const meterRef = useRef<HTMLDivElement | null>(null);
+  const barRefs = useRef<Array<HTMLSpanElement | null>>([]);
+
+  useEffect(() => {
+    const AudioContextConstructor =
+      window.AudioContext ??
+      (window as unknown as { webkitAudioContext?: typeof AudioContext })
+        .webkitAudioContext;
+
+    if (!AudioContextConstructor) {
+      return;
+    }
+
+    let animationFrameId: number | null = null;
+    let audioContext: AudioContext | null = null;
+    let analyser: AnalyserNode | null = null;
+    let source: MediaStreamAudioSourceNode | null = null;
+
+    try {
+      audioContext = new AudioContextConstructor();
+      analyser = audioContext.createAnalyser();
+      analyser.fftSize = 256;
+      analyser.smoothingTimeConstant = 0.82;
+      source = audioContext.createMediaStreamSource(stream);
+      source.connect(analyser);
+    } catch {
+      return;
+    }
+
+    const samples = new Uint8Array(analyser.fftSize);
+
+    const updateLevel = () => {
+      if (!analyser) {
+        return;
+      }
+
+      analyser.getByteTimeDomainData(samples);
+
+      let sumSquares = 0;
+      for (const sample of samples) {
+        const centeredSample = (sample - 128) / 128;
+        sumSquares += centeredSample * centeredSample;
+      }
+
+      const rms = Math.sqrt(sumSquares / samples.length);
+      const level = Math.min(1, rms * 5);
+      meterRef.current?.setAttribute(
+        "aria-valuenow",
+        String(Math.round(level * 100)),
+      );
+
+      micLevelBarWeights.forEach((weight, index) => {
+        const bar = barRefs.current[index];
+        if (bar) {
+          bar.style.height = `${5 + Math.round(level * weight * 18)}px`;
+        }
+      });
+
+      animationFrameId = window.requestAnimationFrame(updateLevel);
+    };
+
+    updateLevel();
+
+    return () => {
+      if (animationFrameId !== null) {
+        window.cancelAnimationFrame(animationFrameId);
+      }
+      source?.disconnect();
+      analyser?.disconnect();
+      if (audioContext && audioContext.state !== "closed") {
+        void audioContext.close();
+      }
+    };
+  }, [stream]);
+
+  return (
+    <div
+      ref={meterRef}
+      className="flex h-7 items-center gap-1 rounded-full border border-white/10 bg-white/[0.04] px-2"
+      role="meter"
+      aria-label="Live microphone level"
+      aria-valuemin={0}
+      aria-valuemax={100}
+      aria-valuenow={0}
+    >
+      {micLevelBarWeights.map((weight, index) => (
+        <span
+          key={`${weight}-${index}`}
+          ref={(element) => {
+            barRefs.current[index] = element;
+          }}
+          className="w-1 rounded-full bg-cyan-100/70 transition-[height] duration-75"
+          style={{ height: 5 }}
+        />
+      ))}
+    </div>
   );
 }
 

@@ -1,5 +1,6 @@
 import Image from "next/image";
 import {
+  Baby,
   DoorOpen,
   Flame,
   Hand,
@@ -27,6 +28,7 @@ const iconMap: Record<IconKey, LucideIcon> = {
   attention: Hand,
   door: DoorOpen,
   speech: MessageCircle,
+  baby: Baby,
 };
 
 export function MinimalAlert({ alert, language }: MinimalAlertProps) {
@@ -36,7 +38,7 @@ export function MinimalAlert({ alert, language }: MinimalAlertProps) {
   const FallbackIcon = iconMap[iconKey];
 
   return (
-    <div className="flex h-full flex-col items-center justify-center px-7 text-center">
+    <div className="flex h-full min-h-0 w-full flex-1 flex-col items-center justify-center px-7 text-center">
       <div className="grid size-44 place-items-center rounded-[2rem] bg-white/[0.06] ring-1 ring-white/10 sm:size-52">
         {image ? (
           <Image

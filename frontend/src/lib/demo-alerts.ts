@@ -2,7 +2,13 @@ export type LanguageCode = "en" | "hi" | "es";
 
 export type AlertTier = "emergency" | "social" | "ambient" | "none";
 
-export type IconKey = "siren" | "fire" | "attention" | "door" | "speech";
+export type IconKey =
+  | "siren"
+  | "fire"
+  | "attention"
+  | "door"
+  | "speech"
+  | "baby";
 
 export type AlertTranslation = {
   alert_text: string;
@@ -165,6 +171,10 @@ export const alertImagesByKey: Record<string, DemoImage> = {
     src: "/demo-assets/images/attention.png",
     alt: "Person raising a hand",
   },
+  baby_crying: {
+    src: "/demo-assets/images/crying-baby.svg",
+    alt: "Crying baby",
+  },
   door_knock: {
     src: "/demo-assets/images/door-knock.svg",
     alt: "Hand knocking on a door",
@@ -179,6 +189,7 @@ export const iconByImageKey: Record<string, IconKey> = {
   emergency_vehicle: "siren",
   fire_alarm: "fire",
   attention_outdoors: "attention",
+  baby_crying: "baby",
   door_knock: "door",
   indoor_address: "speech",
 };
@@ -186,12 +197,12 @@ export const iconByImageKey: Record<string, IconKey> = {
 export const demoClips: DemoClip[] = [
   {
     id: "emergency_vehicle",
-    clipName: "Emergency siren",
+    clipName: "Ambulance",
     icon: "siren",
     imageKey: "emergency_vehicle",
     audio: {
       src: "/demo-assets/audio/ambulance-siren.mp3",
-      label: "Emergency siren",
+      label: "Ambulance",
     },
   },
   {
@@ -206,21 +217,13 @@ export const demoClips: DemoClip[] = [
   },
   {
     id: "attention_outdoors",
-    clipName: "Someone getting attention",
-    icon: "attention",
-    imageKey: "attention_outdoors",
-  },
-  {
-    id: "door_knock",
-    clipName: "Door knock",
-    icon: "door",
-    imageKey: "door_knock",
-  },
-  {
-    id: "indoor_address",
-    clipName: "Name called indoors",
-    icon: "speech",
-    imageKey: "indoor_address",
+    clipName: "Baby crying",
+    icon: "baby",
+    imageKey: "baby_crying",
+    audio: {
+      src: "/demo-assets/audio/baby-crying.mp3",
+      label: "Baby crying",
+    },
   },
 ];
 
