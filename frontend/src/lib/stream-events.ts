@@ -18,8 +18,6 @@ type LiveWindowEventsOptions = {
   onEvent: (event: StreamEvent) => void;
 };
 
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_SOUNDSIGHT_API_URL ?? "http://127.0.0.1:8000";
 const BACKEND_CONNECT_TIMEOUT_MS = 10_000;
 const FIRST_STREAM_CHUNK_TIMEOUT_MS = 2_500;
 
@@ -41,7 +39,7 @@ export async function streamLiveWindowEvents({
   formData.append("language", language);
   formData.append("sessionId", sessionId);
 
-  const response = await fetch(`${API_BASE_URL}/api/live/process-window`, {
+  const response = await fetch(`/api/live/process-window`, {
     method: "POST",
     headers: {
       Accept: "application/x-ndjson",
@@ -63,7 +61,7 @@ async function streamBackendEvents({
   let response: Response;
 
   try {
-    response = await fetch(`${API_BASE_URL}/api/demo/stream-events`, {
+    response = await fetch(`/api/demo/stream-events`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
