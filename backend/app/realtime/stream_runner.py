@@ -1,3 +1,4 @@
+import asyncio
 from collections.abc import AsyncIterator
 from pathlib import Path
 
@@ -86,7 +87,8 @@ async def _iter_stream_events(
 
     try:
         trigger_mode = get_trigger_mode()
-        clip = load_audio_clip(
+        clip = await asyncio.to_thread(
+            load_audio_clip,
             clip_id,
             audio_path=audio_path,
             audio_config=config.audio,

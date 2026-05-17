@@ -14,8 +14,21 @@ from app.realtime.stream_runner import iter_demo_stream_events, iter_live_window
 from app.schemas import LanguageCode, StreamEvent, StreamEventsRequest
 
 
+async def _warm_up_audio_decoders() -> None:
+    """Pre-warm audio decoder libraries and thread pool to avoid cold-start latency."""
+    try:
+        from app.audio.loader import list_supported_audio_files, load_audio_clip
+
+        files = list_supported_audio_files()
+        if files:
+            await asyncio.to_thread(load_audio_clip, "_warmup", audio_path=files[0])
+    except Exception:
+        pass
+
+
 @asynccontextmanager
 async def lifespan(_: FastAPI):
+    asyncio.create_task(_warm_up_audio_decoders())
     try:
         yield
     finally:

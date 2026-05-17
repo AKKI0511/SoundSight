@@ -74,13 +74,13 @@ def load_audio_clip(
     errors: list[str] = []
     samples = _decode_with_soundfile(path, audio_config.sample_rate, errors)
     if samples is None:
-        samples = _decode_with_librosa(path, audio_config.sample_rate, errors)
-    if samples is None:
         samples = _decode_with_av(path, audio_config.sample_rate, errors)
+    if samples is None:
+        samples = _decode_with_miniaudio(path, audio_config.sample_rate, errors)
     if samples is None:
         samples = _decode_with_pydub(path, audio_config.sample_rate, errors)
     if samples is None:
-        samples = _decode_with_miniaudio(path, audio_config.sample_rate, errors)
+        samples = _decode_with_librosa(path, audio_config.sample_rate, errors)
 
     if samples is None:
         detail = "; ".join(errors) if errors else "no decoder returned samples"
