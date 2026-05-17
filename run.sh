@@ -21,9 +21,12 @@ error() {
 usage() {
   cat <<'USAGE'
 Usage:
-  ./run.sh          # cactus mode
-  ./run.sh cactus   # cactus mode
-  ./run.sh dummy    # dummy mode
+  ./run.sh          # cactus mode (production frontend)
+  ./run.sh cactus   # cactus mode (production frontend)
+  ./run.sh dummy    # dummy mode  (production frontend)
+
+Environment variables:
+  SOUNDSIGHT_FRONTEND_DEV=1   Use Next.js dev server instead of production build
 USAGE
 }
 
@@ -195,12 +198,26 @@ info "Starting backend on http://localhost:8000."
 ) &
 backend_pid=$!
 
-info "Starting frontend on http://localhost:3000."
-(
-  cd "$FRONTEND_DIR"
-  exec npm run dev -- --hostname 0.0.0.0
-) &
-frontend_pid=$!
+if [ "${SOUNDSIGHT_FRONTEND_DEV:-}" = "1" ]; then
+  info "Starting frontend in DEV mode on http://localhost:3000."
+  (
+    cd "$FRONTEND_DIR"
+    exec npm run dev -- --hostname 0.0.0.0
+  ) &
+  frontend_pid=$!
+else
+  if [ ! -f "$FRONTEND_DIR/.next/BUILD_ID" ]; then
+    rm -rf "$FRONTEND_DIR/.next"
+    info "Building frontend for production..."
+    (cd "$FRONTEND_DIR" && npm run build)
+  fi
+  info "Starting frontend in PRODUCTION mode on http://localhost:3000."
+  (
+    cd "$FRONTEND_DIR"
+    exec npm run start -- --hostname 0.0.0.0 -p 3000
+  ) &
+  frontend_pid=$!
+fi
 
 sleep 2
 
@@ -216,10 +233,16 @@ if ! process_is_running "$frontend_pid"; then
   exit "$frontend_status"
 fi
 
+frontend_mode="production"
+if [ "${SOUNDSIGHT_FRONTEND_DEV:-}" = "1" ]; then
+  frontend_mode="dev"
+fi
+
 printf "\nSoundSight is running\n"
 printf "Open: http://localhost:3000\n"
 printf "Backend: http://localhost:8000\n"
 printf "Mode: %s\n" "$mode"
+printf "Frontend: %s\n" "$frontend_mode"
 printf "Press Ctrl+C to stop\n\n"
 
 while true; do

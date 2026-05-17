@@ -18,8 +18,8 @@ type LiveWindowEventsOptions = {
   onEvent: (event: StreamEvent) => void;
 };
 
-const BACKEND_CONNECT_TIMEOUT_MS = 10_000;
-const FIRST_STREAM_CHUNK_TIMEOUT_MS = 2_500;
+const BACKEND_CONNECT_TIMEOUT_MS = 30_000;
+const FIRST_STREAM_CHUNK_TIMEOUT_MS = 15_000;
 
 export async function streamDemoEvents(
   options: DemoStreamEventsOptions,
@@ -43,6 +43,7 @@ export async function streamLiveWindowEvents({
     method: "POST",
     headers: {
       Accept: "application/x-ndjson",
+      "ngrok-skip-browser-warning": "true",
     },
     body: formData,
     signal,
@@ -66,6 +67,7 @@ async function streamBackendEvents({
       headers: {
         "Content-Type": "application/json",
         Accept: "application/x-ndjson",
+        "ngrok-skip-browser-warning": "true",
       },
       body: JSON.stringify({ clipId, language }),
       signal: backendAbort.signal,

@@ -56,6 +56,28 @@ Then open **http://localhost:3000**
 
 ---
 
+## Mobile / ngrok Testing
+
+The frontend runs in **production mode** by default, which avoids Next.js dev-only issues (font 403s, HMR websocket failures) that break tunnels.
+
+```bash
+# 1. Start SoundSight (builds frontend on first run)
+./run.sh dummy
+
+# 2. In a second terminal, expose port 3000 via ngrok
+ngrok http 3000
+
+# 3. Open the HTTPS URL from ngrok on your phone
+```
+
+> **Tip:** Production mode is recommended for ngrok because Next.js dev HMR websockets fail through tunnels. If you need hot-reload during development, use:
+>
+> ```bash
+> SOUNDSIGHT_FRONTEND_DEV=1 ./run.sh dummy
+> ```
+
+---
+
 ## Pages
 
 | Page | URL | Description |

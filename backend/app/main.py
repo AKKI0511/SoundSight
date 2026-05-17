@@ -39,7 +39,7 @@ app = FastAPI(title="SoundSight Streaming API", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origin_regex=r"https?://(localhost|127\.0\.0\.1):\d+",
+    allow_origin_regex=r"https?://(localhost|127\.0\.0\.1)(:\d+)?|https://.*\.ngrok(-free)?\.(dev|io|app)",
     allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -51,11 +51,18 @@ def health() -> dict[str, str]:
     return {"status": "ok"}
 
 
+_STREAM_HEADERS = {
+    "X-Accel-Buffering": "no",
+    "Cache-Control": "no-cache, no-transform",
+}
+
+
 @app.post("/api/demo/stream-events")
 def stream_demo_events(request: StreamEventsRequest) -> StreamingResponse:
     return StreamingResponse(
         _stream_demo_events(request),
         media_type="application/x-ndjson",
+        headers=_STREAM_HEADERS,
     )
 
 
@@ -73,6 +80,7 @@ async def process_live_window(
             language=language,
         ),
         media_type="application/x-ndjson",
+        headers=_STREAM_HEADERS,
     )
 
 
