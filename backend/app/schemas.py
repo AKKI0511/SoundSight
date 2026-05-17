@@ -16,14 +16,6 @@ SoundType = Literal[
 ]
 AlertTier = Literal["emergency", "social", "ambient", "none"]
 ModelSource = Literal["dummy", "cactus"]
-EngineState = Literal["IDLE", "CANDIDATE", "ACTIVE", "COOLDOWN"]
-CandidateType = Literal[
-    "fire_alarm",
-    "emergency_vehicle",
-    "door_knock",
-    "speech_attention",
-    "unknown",
-]
 
 
 class ApiModel(BaseModel):
@@ -35,35 +27,36 @@ class StreamEventsRequest(ApiModel):
     language: LanguageCode = "en"
 
 
-class AlertTranslation(ApiModel):
-    alert_text: str
-    action: str
-
-
 class AlertPayload(ApiModel):
     sound_type: SoundType
     tier: AlertTier
-    image_key: str
     alert_text: str
     action: str
-    translations: dict[Literal["hi", "es"], AlertTranslation]
+    image_key: str
     haptic: str
-    confidence: float
+    confidence: float = Field(ge=0.0, le=1.0)
+    language: LanguageCode
 
 
-class AlertAnalysis(ApiModel):
-    detected_sound_type: SoundType = Field(alias="detectedSoundType")
-    tier: AlertTier
-    alert_text: str = Field(alias="alertText")
-    action: str
-    confidence: float
-    should_alert: bool = Field(alias="shouldAlert")
-    alert: AlertPayload
+class AlertAnalysis(AlertPayload):
+    should_alert: bool
     model_error_message: str | None = Field(
         default=None,
         alias="modelErrorMessage",
         exclude=True,
     )
+
+    def to_alert_payload(self) -> AlertPayload:
+        return AlertPayload(
+            sound_type=self.sound_type,
+            tier=self.tier,
+            alert_text=self.alert_text,
+            action=self.action,
+            image_key=self.image_key,
+            haptic=self.haptic,
+            confidence=self.confidence,
+            language=self.language,
+        )
 
 
 class SessionStartedEvent(ApiModel):
@@ -79,47 +72,13 @@ class EngineLogEvent(ApiModel):
     timestamp_ms: int = Field(alias="timestampMs")
     window_start_ms: int = Field(alias="windowStartMs")
     window_end_ms: int = Field(alias="windowEndMs")
+    trigger_mode: str = Field(alias="triggerMode")
     rms: float
-    noise_floor: float = Field(alias="noiseFloor")
-    rms_z_score: float = Field(alias="rmsZScore")
+    peak: float
     onset_score: float = Field(alias="onsetScore")
-    spectral_flux: float = Field(alias="spectralFlux")
-    zero_crossing_rate: float = Field(alias="zeroCrossingRate")
-    spectral_centroid: float = Field(alias="spectralCentroid")
-    sustained_energy_score: float = Field(alias="sustainedEnergyScore")
-    silence_score: float = Field(alias="silenceScore")
-    speech_probability: float = Field(alias="speechProbability")
-    speech_source: str = Field(alias="speechSource")
-    speech_warning: str | None = Field(default=None, alias="speechWarning")
-    candidate_type: CandidateType | None = Field(alias="candidateType")
-    candidate_confidence: float = Field(alias="candidateConfidence")
+    silent: bool
     should_call_model: bool = Field(alias="shouldCallModel")
-    state: EngineState
-    candidate: bool
-
-
-class CandidateStartEvent(ApiModel):
-    type: Literal["candidate_start"] = "candidate_start"
-    session_id: str = Field(alias="sessionId")
-    candidate_id: str = Field(alias="candidateId")
-    timestamp_ms: int = Field(alias="timestampMs")
-    window_start_ms: int = Field(alias="windowStartMs")
-    window_end_ms: int = Field(alias="windowEndMs")
-    candidate_type: CandidateType = Field(alias="candidateType")
-    candidate_confidence: float = Field(alias="candidateConfidence")
-
-
-class CandidateUpdateEvent(ApiModel):
-    type: Literal["candidate_update"] = "candidate_update"
-    session_id: str = Field(alias="sessionId")
-    candidate_id: str = Field(alias="candidateId")
-    timestamp_ms: int = Field(alias="timestampMs")
-    window_start_ms: int = Field(alias="windowStartMs")
-    window_end_ms: int = Field(alias="windowEndMs")
-    candidate_type: CandidateType = Field(alias="candidateType")
-    candidate_confidence: float = Field(alias="candidateConfidence")
-    should_call_model: bool = Field(alias="shouldCallModel")
-    state: EngineState
+    reason: str
 
 
 class ModelCallEvent(ApiModel):
@@ -134,7 +93,7 @@ class ModelCallEvent(ApiModel):
     reason: str
     window_start_ms: int = Field(alias="windowStartMs")
     window_end_ms: int = Field(alias="windowEndMs")
-    candidate_type: CandidateType = Field(alias="candidateType")
+    candidate_type: str = Field(alias="candidateType")
     candidate_confidence: float = Field(alias="candidateConfidence")
 
 
@@ -193,8 +152,6 @@ class ErrorEvent(ApiModel):
 StreamEvent = (
     SessionStartedEvent
     | EngineLogEvent
-    | CandidateStartEvent
-    | CandidateUpdateEvent
     | ModelCallEvent
     | ModelResultEvent
     | ModelErrorEvent

@@ -9,29 +9,19 @@ import sys
 import tempfile
 import threading
 import wave
-from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Callable, Literal
+from typing import Any
 
 import numpy as np
 from pydantic import BaseModel, Field, ValidationError, field_validator
 
-from config import DEFAULT_CONFIG
-from model_gateway import safe_no_alert_analysis
-from schemas import AlertAnalysis, AlertPayload, AlertTranslation, AlertTier, SoundType
+from app.config import DEFAULT_CONFIG
+from app.model.no_alert import no_alert
+from app.schemas import AlertAnalysis, AlertTier, LanguageCode, SoundType
 
 
 DEFAULT_CACTUS_MODEL = "google/gemma-4-E2B-it"
 CACTUS_SAMPLE_RATE = DEFAULT_CONFIG.audio.sample_rate
-
-
-@dataclass(frozen=True)
-class CactusGatewayResult:
-    analysis: AlertAnalysis
-    raw_result_json: str | None = None
-    raw_response: str | None = None
-    parsed_json: dict[str, Any] | None = None
-    error_message: str | None = None
 
 
 class CactusAlertJson(BaseModel):
@@ -43,7 +33,7 @@ class CactusAlertJson(BaseModel):
     image_key: str
     haptic: str
     confidence: float = Field(ge=0.0, le=1.0)
-    translations: dict[Literal["hi", "es"], AlertTranslation]
+    language: LanguageCode
 
     @field_validator("alert_text")
     @classmethod
@@ -59,17 +49,6 @@ class CactusAlertJson(BaseModel):
             raise ValueError("action must be 8 words or fewer")
         return value
 
-    @field_validator("translations")
-    @classmethod
-    def _required_translations(
-        cls,
-        value: dict[Literal["hi", "es"], AlertTranslation],
-    ) -> dict[Literal["hi", "es"], AlertTranslation]:
-        missing = {"hi", "es"} - set(value)
-        if missing:
-            raise ValueError(f"missing translations: {', '.join(sorted(missing))}")
-        return {"hi": value["hi"], "es": value["es"]}
-
 
 _MODEL_LOCK = threading.RLock()
 _CACTUS_API: Any | None = None
@@ -77,15 +56,15 @@ _CACTUS_MODEL: Any | None = None
 _CACTUS_MODEL_PATH: Path | None = None
 
 
-async def analyze_candidate_with_cactus(
-    candidate_window: object,
-    candidate_metadata: dict[str, Any],
-    language: str,
-) -> CactusGatewayResult:
+async def analyze_candidate_with_gemma4(
+    audio_window: object,
+    metadata: dict[str, Any],
+    language: LanguageCode,
+) -> AlertAnalysis:
     return await asyncio.to_thread(
-        _analyze_candidate_with_cactus_sync,
-        candidate_window,
-        candidate_metadata,
+        _analyze_candidate_with_gemma4_sync,
+        audio_window,
+        metadata,
         language,
     )
 
@@ -111,24 +90,19 @@ def destroy_cactus_model() -> None:
             _CACTUS_MODEL = None
 
 
-def _analyze_candidate_with_cactus_sync(
-    candidate_window: object,
-    candidate_metadata: dict[str, Any],
-    language: str,
-) -> CactusGatewayResult:
+def _analyze_candidate_with_gemma4_sync(
+    audio_window: object,
+    metadata: dict[str, Any],
+    language: LanguageCode,
+) -> AlertAnalysis:
     audio_path: Path | None = None
-
     try:
-        audio_path = _write_candidate_wav(candidate_window)
-        prompt = _build_prompt(candidate_metadata, language)
+        audio_path = _write_candidate_wav(audio_window)
+        prompt = _build_prompt(metadata, language)
         raw_result_json = _complete_with_cactus(prompt, audio_path)
-        return _result_from_cactus_completion(raw_result_json)
+        return _analysis_from_cactus_completion(raw_result_json, language)
     except Exception as exc:
-        message = _format_error(exc)
-        return CactusGatewayResult(
-            analysis=safe_no_alert_analysis(message),
-            error_message=message,
-        )
+        return no_alert(language, model_error_message=_format_error(exc))
     finally:
         if audio_path is not None:
             try:
@@ -149,9 +123,9 @@ def _complete_with_cactus(prompt: str, audio_path: Path) -> str:
     )
     options = json.dumps(
         {
-            "max_tokens": 512,
-            "temperature": 0.1,
-            "stop_sequences": ["<|im_end|>"],
+            "max_tokens": 256,
+            "temperature": 0.0,
+            "stop_sequences": ["```", "<|im_end|>"],
         }
     )
 
@@ -174,7 +148,7 @@ def _load_cactus_api() -> Any:
             sys.path.insert(0, str(cactus_python))
 
     try:
-        from src import cactus as cactus_api
+        from src import cactus as cactus_api  # type: ignore
     except Exception as exc:
         raise RuntimeError(
             "Could not import Cactus Python bindings. Set SOUNDSIGHT_CACTUS_REPO "
@@ -200,13 +174,24 @@ def _resolve_model_path() -> Path:
     configured_path = os.getenv("SOUNDSIGHT_CACTUS_MODEL_PATH")
     if configured_path:
         path = Path(configured_path).expanduser()
+        if "gemma-4" not in str(path).lower():
+            raise RuntimeError(
+                "Cactus mode only supports Gemma 4. "
+                "SOUNDSIGHT_CACTUS_MODEL_PATH must point to Gemma 4 weights."
+            )
         if not path.exists():
             raise RuntimeError(f"SOUNDSIGHT_CACTUS_MODEL_PATH does not exist: {path}")
         return path
 
     model_id = os.getenv("SOUNDSIGHT_CACTUS_MODEL", DEFAULT_CACTUS_MODEL)
+    if "gemma-4" not in model_id.lower():
+        raise RuntimeError(
+            "Cactus mode only supports Gemma 4. Set "
+            f"SOUNDSIGHT_CACTUS_MODEL={DEFAULT_CACTUS_MODEL!r}."
+        )
+
     try:
-        from src.downloads import ensure_model
+        from src.downloads import ensure_model  # type: ignore
     except Exception as exc:
         raise RuntimeError(
             "SOUNDSIGHT_CACTUS_MODEL_PATH is required when src.downloads is unavailable."
@@ -215,8 +200,8 @@ def _resolve_model_path() -> Path:
     return Path(ensure_model(model_id))
 
 
-def _write_candidate_wav(candidate_window: object) -> Path:
-    samples = np.asarray(candidate_window, dtype=np.float32)
+def _write_candidate_wav(audio_window: object) -> Path:
+    samples = np.asarray(audio_window, dtype=np.float32)
     if samples.ndim > 1:
         samples = np.mean(samples, axis=1, dtype=np.float32)
 
@@ -240,87 +225,70 @@ def _write_candidate_wav(candidate_window: object) -> Path:
     return wav_path
 
 
-def _build_prompt(candidate_metadata: dict[str, Any], language: str) -> str:
-    metadata_json = json.dumps(candidate_metadata, ensure_ascii=True, sort_keys=True)
-    return f"""You are SoundSight, an accessibility assistant for Deaf and hard-of-hearing users. Analyze this audio clip and decide if it contains an important sound event. Return only valid JSON.
+def _build_prompt(metadata: dict[str, Any], language: LanguageCode) -> str:
+    metadata_json = json.dumps(metadata, ensure_ascii=True, sort_keys=True)
+    return f"""You are SoundSight, an accessibility assistant for Deaf and hard-of-hearing users. Analyze the attached audio directly with Gemma 4. Do not transcribe first. Return only one valid compact JSON object and no markdown.
 
-Return one JSON object with this shape:
-{{
-  "should_alert": true,
-  "sound_type": "fire_alarm",
-  "tier": "emergency",
-  "alert_text": "Fire alarm detected.",
-  "action": "Move to safety now.",
-  "image_key": "fire_alarm",
-  "haptic": "SOS vibration",
-  "confidence": 0.91,
-  "translations": {{
-    "hi": {{ "alert_text": "...", "action": "..." }},
-    "es": {{ "alert_text": "...", "action": "..." }}
-  }}
-}}
+Required JSON shape:
+{{"should_alert":true,"sound_type":"fire_alarm","tier":"emergency","alert_text":"Fire alarm detected.","action":"Move to safety now.","image_key":"fire_alarm","haptic":"SOS vibration","confidence":0.91,"language":"{language}"}}
 
 Allowed sound_type values: emergency_vehicle, fire_alarm, door_knock, attention_outdoors, addressing_user, baby_crying, background_noise, unknown.
 Allowed tier values: emergency, social, ambient, none.
 Rules:
-- If uncertain, should_alert=false.
-- If only background noise, should_alert=false.
+- Use only the requested UI language for alert_text and action.
+- Set language exactly to "{language}".
+- Return selected-language fields only; do not include other language fields.
+- If uncertain or only background noise, set should_alert=false, sound_type="unknown" or "background_noise", tier="none", haptic="None", confidence <= 0.30.
 - alert_text max 12 words.
 - action max 8 words.
-- Always include English output plus Hindi and Spanish translations.
-- Use image_key matching the sound_type when possible.
+- Use image_key matching sound_type when possible.
 
-Requested UI language: {language}
-Detector candidate metadata: {metadata_json}
+Detector metadata: {metadata_json}
 """
 
 
-def _result_from_cactus_completion(raw_result_json: str) -> CactusGatewayResult:
+def _analysis_from_cactus_completion(
+    raw_result_json: str,
+    language: LanguageCode,
+) -> AlertAnalysis:
     try:
         result = json.loads(raw_result_json)
     except json.JSONDecodeError as exc:
-        message = f"Cactus returned non-JSON completion envelope: {exc}"
-        return CactusGatewayResult(
-            analysis=safe_no_alert_analysis(message),
-            raw_result_json=raw_result_json,
-            error_message=message,
-        )
+        raise RuntimeError(f"Cactus returned non-JSON completion envelope: {exc}") from exc
 
     if result.get("success") is False:
-        message = f"Cactus completion failed: {result.get('error') or 'unknown error'}"
-        return CactusGatewayResult(
-            analysis=safe_no_alert_analysis(message),
-            raw_result_json=raw_result_json,
-            raw_response=_string_or_none(result.get("response")),
-            error_message=message,
-        )
+        raise RuntimeError(f"Cactus completion failed: {result.get('error') or 'unknown error'}")
+
+    if result.get("cloud_handoff"):
+        raise RuntimeError("Cactus attempted cloud handoff; SoundSight cactus mode is local only.")
 
     raw_response = _string_or_none(result.get("response"))
     if not raw_response:
-        message = "Cactus completion did not include a response field."
-        return CactusGatewayResult(
-            analysis=safe_no_alert_analysis(message),
-            raw_result_json=raw_result_json,
-            error_message=message,
-        )
+        raise RuntimeError("Cactus completion did not include a response field.")
 
     try:
         parsed_json = parse_alert_json(raw_response)
         parsed_alert = CactusAlertJson.model_validate(parsed_json)
     except (ValueError, ValidationError) as exc:
-        message = f"Cactus response did not validate as alert JSON: {_format_error(exc)}"
-        return CactusGatewayResult(
-            analysis=safe_no_alert_analysis(message),
-            raw_result_json=raw_result_json,
-            raw_response=raw_response,
-            error_message=message,
+        raise RuntimeError(
+            f"Cactus response did not validate as SoundSight alert JSON: {_format_error(exc)}"
+        ) from exc
+
+    if parsed_alert.language != language:
+        raise RuntimeError(
+            f"Cactus returned language {parsed_alert.language!r}, expected {language!r}."
         )
 
-    return CactusGatewayResult(
-        analysis=_analysis_from_cactus_alert(parsed_alert),
-        raw_result_json=raw_result_json,
-        raw_response=raw_response,
-        parsed_json=parsed_alert.model_dump(),
+    return AlertAnalysis(
+        should_alert=parsed_alert.should_alert,
+        sound_type=parsed_alert.sound_type,
+        tier=parsed_alert.tier,
+        alert_text=parsed_alert.alert_text,
+        action=parsed_alert.action,
+        image_key=parsed_alert.image_key,
+        haptic=parsed_alert.haptic,
+        confidence=round(float(parsed_alert.confidence), 3),
+        language=parsed_alert.language,
     )
 
 
@@ -375,28 +343,6 @@ def _balanced_json_candidates(value: str) -> list[str]:
                     break
 
     return candidates
-
-
-def _analysis_from_cactus_alert(alert_json: CactusAlertJson) -> AlertAnalysis:
-    alert = AlertPayload(
-        sound_type=alert_json.sound_type,
-        tier=alert_json.tier,
-        image_key=alert_json.image_key,
-        alert_text=alert_json.alert_text,
-        action=alert_json.action,
-        translations=alert_json.translations,
-        haptic=alert_json.haptic,
-        confidence=round(float(alert_json.confidence), 3),
-    )
-    return AlertAnalysis(
-        detected_sound_type=alert.sound_type,
-        tier=alert.tier,
-        alert_text=alert.alert_text,
-        action=alert.action,
-        confidence=alert.confidence,
-        should_alert=alert_json.should_alert,
-        alert=alert,
-    )
 
 
 def _string_or_none(value: object) -> str | None:

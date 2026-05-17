@@ -1,6 +1,6 @@
 import asyncio
-from contextlib import asynccontextmanager
 from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
 from pathlib import Path
 import tempfile
 from uuid import uuid4
@@ -9,9 +9,9 @@ from fastapi import FastAPI, File, Form, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 
-from audio_engine import iter_streaming_detection_events
-from model_gateway import shutdown_model_gateway
-from schemas import LanguageCode, StreamEvent, StreamEventsRequest
+from app.model.gateway import shutdown_model_gateway
+from app.realtime.stream_runner import iter_demo_stream_events, iter_live_window_events
+from app.schemas import LanguageCode, StreamEvent, StreamEventsRequest
 
 
 @asynccontextmanager
@@ -41,7 +41,7 @@ def health() -> dict[str, str]:
 @app.post("/api/demo/stream-events")
 def stream_demo_events(request: StreamEventsRequest) -> StreamingResponse:
     return StreamingResponse(
-        _stream_events(request),
+        _stream_demo_events(request),
         media_type="application/x-ndjson",
     )
 
@@ -63,11 +63,11 @@ async def process_live_window(
     )
 
 
-async def _stream_events(request: StreamEventsRequest) -> AsyncIterator[str]:
+async def _stream_demo_events(request: StreamEventsRequest) -> AsyncIterator[str]:
     session_id = f"demo_{uuid4().hex}"
     elapsed_ms = 0
 
-    async for event in iter_streaming_detection_events(
+    async for event in iter_demo_stream_events(
         request.clip_id,
         session_id,
         language=request.language,
@@ -85,7 +85,7 @@ async def _stream_live_window_events(
     language: LanguageCode,
 ) -> AsyncIterator[str]:
     try:
-        async for event in iter_streaming_detection_events(
+        async for event in iter_live_window_events(
             "live_window",
             session_id,
             language=language,

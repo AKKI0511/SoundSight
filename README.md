@@ -55,20 +55,17 @@ cd backend
 uv sync
 ```
 
-Run in deterministic dummy mode on macOS/Linux:
-
-```bash
-uv run uvicorn main:app --reload --port 8000
-```
-
 Run in deterministic dummy mode on Windows PowerShell:
 
 ```powershell
 cd backend
-uv run uvicorn main:app --reload --port 8000
+uv sync
+$env:SOUNDSIGHT_MODEL_MODE="dummy"
+$env:SOUNDSIGHT_TRIGGER_MODE="detector"
+uv run uvicorn app.main:app --reload --port 8000
 ```
 
-Dummy mode is the default when `SOUNDSIGHT_MODEL_MODE` is unset.
+Dummy mode is the default when `SOUNDSIGHT_MODEL_MODE` is unset. Backend-specific instructions are in `backend/README.md`.
 
 ### Frontend
 
@@ -115,11 +112,13 @@ SoundSight uses one model mode variable:
 
 ```bash
 SOUNDSIGHT_MODEL_MODE=dummy | cactus
+SOUNDSIGHT_TRIGGER_MODE=detector | interval
+SOUNDSIGHT_INTERVAL_SECONDS=2.0
 ```
 
 ### Dummy Mode
 
-Dummy mode is deterministic, works on Windows, and keeps all dummy alert payloads centralized in `backend/model_gateway.py`.
+Dummy mode is deterministic, works on Windows, and keeps all dummy alert payloads centralized in `backend/app/model/dummy_gateway.py`.
 
 ### Cactus Mode
 
@@ -152,10 +151,11 @@ Run SoundSight with Cactus:
 ```bash
 cd backend
 export SOUNDSIGHT_MODEL_MODE=cactus
+export SOUNDSIGHT_TRIGGER_MODE=detector
 export SOUNDSIGHT_CACTUS_REPO="$HOME/cactus"
 export SOUNDSIGHT_CACTUS_MODEL="google/gemma-4-E2B-it"
 export SOUNDSIGHT_CACTUS_MODEL_PATH="$HOME/cactus/weights/gemma-4-e2b-it"
-uv run uvicorn main:app --reload --port 8000
+uv run uvicorn app.main:app --reload --port 8000
 ```
 
 `SOUNDSIGHT_CACTUS_MODEL_PATH` can be omitted if the Cactus `src.downloads.ensure_model` helper is available.
@@ -164,7 +164,7 @@ To verify Cactus integration on macOS/Linux:
 
 ```bash
 cd backend
-uv run python smoke_test_cactus_audio.py
+uv run python scripts/smoke_test_cactus_audio.py
 ```
 
 Then run Demo or Live and inspect the NDJSON stream for `model_call` and `model_result` events with `"source":"cactus"`.

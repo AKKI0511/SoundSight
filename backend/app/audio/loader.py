@@ -7,7 +7,7 @@ import numpy as np
 import soundfile as sf
 from numpy.typing import NDArray
 
-from config import AudioConfig, DEFAULT_CONFIG, PathConfig
+from app.config import AudioConfig, DEFAULT_CONFIG, PathConfig
 
 
 FloatArray = NDArray[np.float32]
@@ -24,14 +24,9 @@ CLIP_FILE_CANDIDATES: dict[str, tuple[str, ...]] = {
     ),
     "fire_alarm": ("fire-alarm-414915.mp3",),
     "attention": ("baby-crying-434113.mp3", "baby-crying-loud-100441.mp3"),
-    "getting_attention": (
-        "baby-crying-434113.mp3",
-        "baby-crying-loud-100441.mp3",
-    ),
-    "attention_outdoors": (
-        "baby-crying-434113.mp3",
-        "baby-crying-loud-100441.mp3",
-    ),
+    "getting_attention": ("baby-crying-434113.mp3", "baby-crying-loud-100441.mp3"),
+    "attention_outdoors": ("baby-crying-434113.mp3", "baby-crying-loud-100441.mp3"),
+    "baby_crying": ("baby-crying-434113.mp3", "baby-crying-loud-100441.mp3"),
 }
 
 
@@ -42,6 +37,7 @@ CLIP_SEARCH_PATTERNS: dict[str, tuple[str, ...]] = {
     "attention": ("*attention*.mp3", "*baby*cry*.mp3", "*cry*.mp3"),
     "getting_attention": ("*attention*.mp3", "*baby*cry*.mp3", "*cry*.mp3"),
     "attention_outdoors": ("*attention*.mp3", "*baby*cry*.mp3", "*cry*.mp3"),
+    "baby_crying": ("*baby*cry*.mp3", "*cry*.mp3"),
     "door_knock": ("*door*knock*.mp3", "*knock*.mp3", "*doorbell*.mp3"),
     "indoor_address": ("*indoor*.mp3", "*address*.mp3", "*speech*.mp3"),
     "addressing_user": ("*indoor*.mp3", "*address*.mp3", "*speech*.mp3"),
@@ -77,16 +73,12 @@ def load_audio_clip(
 
     errors: list[str] = []
     samples = _decode_with_soundfile(path, audio_config.sample_rate, errors)
-
     if samples is None:
         samples = _decode_with_librosa(path, audio_config.sample_rate, errors)
-
     if samples is None:
         samples = _decode_with_av(path, audio_config.sample_rate, errors)
-
     if samples is None:
         samples = _decode_with_pydub(path, audio_config.sample_rate, errors)
-
     if samples is None:
         samples = _decode_with_miniaudio(path, audio_config.sample_rate, errors)
 
@@ -101,7 +93,7 @@ def load_audio_clip(
         raise AudioUnavailableError(f"Audio file '{path.name}' decoded to 0 samples.")
 
     return LoadedAudioClip(
-        clip_id=canonical_clip_id_for_path(path, fallback_clip_id=clip_id),
+        clip_id=canonical_clip_id_for_path(path, default_clip_id=clip_id),
         path=path,
         samples=samples,
         sample_rate=audio_config.sample_rate,
@@ -159,33 +151,35 @@ def audio_directories(path_config: PathConfig = DEFAULT_CONFIG.paths) -> list[Pa
 def canonical_clip_id_for_path(
     path: Path,
     *,
-    fallback_clip_id: str | None = None,
+    default_clip_id: str | None = None,
 ) -> str:
     normalized = normalize_id(path.stem)
 
     if "fire" in normalized and "alarm" in normalized:
         return "fire_alarm"
-
     if "ambulance" in normalized or "siren" in normalized or "emergency" in normalized:
         return "emergency_vehicle"
-
-    if "baby" in normalized or "cry" in normalized or "attention" in normalized:
+    if "baby" in normalized or "cry" in normalized:
+        return "baby_crying"
+    if "attention" in normalized:
         return "attention_outdoors"
-
     if "door" in normalized or "knock" in normalized:
         return "door_knock"
-
     if "indoor" in normalized or "address" in normalized or "speech" in normalized:
-        return "indoor_address"
+        return "addressing_user"
 
-    return normalize_id(fallback_clip_id or path.stem)
+    return normalize_id(default_clip_id or path.stem)
 
 
 def normalize_id(value: str) -> str:
     return value.lower().replace("-", "_").replace(" ", "_")
 
 
-def _decode_with_soundfile(path: Path, sample_rate: int, errors: list[str]) -> FloatArray | None:
+def _decode_with_soundfile(
+    path: Path,
+    sample_rate: int,
+    errors: list[str],
+) -> FloatArray | None:
     try:
         samples, source_rate = sf.read(str(path), dtype="float32", always_2d=False)
         if samples.ndim == 2:
@@ -199,7 +193,11 @@ def _decode_with_soundfile(path: Path, sample_rate: int, errors: list[str]) -> F
         return None
 
 
-def _decode_with_librosa(path: Path, sample_rate: int, errors: list[str]) -> FloatArray | None:
+def _decode_with_librosa(
+    path: Path,
+    sample_rate: int,
+    errors: list[str],
+) -> FloatArray | None:
     try:
         samples, _ = librosa.load(str(path), sr=sample_rate, mono=True, dtype=np.float32)
         return np.asarray(samples, dtype=np.float32)
@@ -237,7 +235,6 @@ def _decode_with_av(path: Path, sample_rate: int, errors: list[str]) -> FloatArr
 
         if not chunks:
             raise ValueError("no decoded audio frames")
-
         return np.concatenate(chunks).astype(np.float32, copy=False)
     except Exception as exc:
         errors.append(f"av: {exc}")
@@ -278,7 +275,11 @@ def _decode_with_pydub(path: Path, sample_rate: int, errors: list[str]) -> Float
         return None
 
 
-def _decode_with_miniaudio(path: Path, sample_rate: int, errors: list[str]) -> FloatArray | None:
+def _decode_with_miniaudio(
+    path: Path,
+    sample_rate: int,
+    errors: list[str],
+) -> FloatArray | None:
     try:
         decoded = miniaudio.decode_file(
             str(path),

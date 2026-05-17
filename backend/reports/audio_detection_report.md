@@ -1,76 +1,70 @@
-# SoundSight Audio Detection Report
+# SoundSight Audio Trigger Report
+
+- model source: dummy
+- model: deterministic_dummy
+- trigger mode: detector
 
 ## baby-crying-434113.mp3
 
-- clip id: attention_outdoors
+- clip id: baby_crying
 - duration: 12147 ms (12.147 s)
-- candidate intervals: 500 ms (0.500 s) to 12147 ms (12.147 s) speech_attention max=1.000
-- candidate timeline: 500 ms (0.500 s):speech_attention(1.000), 1000 ms (1.000 s):speech_attention(1.000), 1500 ms (1.500 s):speech_attention(1.000), 2000 ms (2.000 s):speech_attention(1.000), 2500 ms (2.500 s):speech_attention(1.000), 3000 ms (3.000 s):speech_attention(1.000), 3500 ms (3.500 s):speech_attention(1.000), 4000 ms (4.000 s):speech_attention(1.000), 4500 ms (4.500 s):speech_attention(1.000), 5000 ms (5.000 s):speech_attention(1.000), 5500 ms (5.500 s):speech_attention(1.000), 6000 ms (6.000 s):speech_attention(0.883), 6500 ms (6.500 s):speech_attention(1.000), 7000 ms (7.000 s):speech_attention(1.000), 7500 ms (7.500 s):speech_attention(1.000), 8000 ms (8.000 s):speech_attention(1.000), 8500 ms (8.500 s):speech_attention(1.000), 9000 ms (9.000 s):speech_attention(1.000), 9500 ms (9.500 s):speech_attention(1.000), 10000 ms (10.000 s):speech_attention(1.000), 10500 ms (10.500 s):speech_attention(1.000), 11000 ms (11.000 s):speech_attention(0.944), 11500 ms (11.500 s):speech_attention(0.977), 12000 ms (12.000 s):speech_attention(1.000), 12147 ms (12.147 s):speech_attention(1.000)
-- VAD/speech: Silero loaded=no; sources=fallback; speech intervals=500 ms (0.500 s) to 12147 ms (12.147 s) max=1.000
-- model_call timestamps: 500 ms (0.500 s)
-- model_result outputs: 500 ms (0.500 s):attention_outdoors shouldAlert=True confidence=0.990
-- alert_start timestamps: 500 ms (0.500 s):attention_outdoors_1 attention_outdoors confidence=0.990
-- alert_end timestamps: 12147 ms (12.147 s)
+- trigger timeline: 4000 ms (4.000 s):rms=0.117 peak=0.651 call=True reason=energy_or_onset, 6000 ms (6.000 s):rms=0.115 peak=0.651 call=True reason=energy_or_onset, 8000 ms (8.000 s):rms=0.124 peak=0.633 call=True reason=energy_or_onset, 10000 ms (10.000 s):rms=0.144 peak=0.633 call=True reason=energy_or_onset, 12000 ms (12.000 s):rms=0.124 peak=0.618 call=True reason=energy_or_onset, 12147 ms (12.147 s):rms=0.102 peak=0.435 call=True reason=energy_or_onset
+- model_call timestamps: 4000 ms (4.000 s), 6000 ms (6.000 s), 8000 ms (8.000 s), 10000 ms (10.000 s), 12000 ms (12.000 s), 12147 ms (12.147 s)
+- model_result outputs: 4000 ms (4.000 s):dummy:baby_crying should_alert=True confidence=0.990 language=en, 6000 ms (6.000 s):dummy:baby_crying should_alert=True confidence=0.990 language=en, 8000 ms (8.000 s):dummy:baby_crying should_alert=True confidence=0.990 language=en, 10000 ms (10.000 s):dummy:baby_crying should_alert=True confidence=0.990 language=en, 12000 ms (12.000 s):dummy:baby_crying should_alert=True confidence=0.990 language=en, 12147 ms (12.147 s):dummy:baby_crying should_alert=True confidence=0.990 language=en
+- model_error outputs: none
+- alert_start timestamps: 4000 ms (4.000 s):baby_crying_1 baby_crying confidence=0.990 language=en
+- alert_end timestamps: none
 - total alerts emitted: 1
-- warnings: Silero VAD unavailable: No module named 'silero_vad'
 - errors: none
 
 ## baby-crying-loud-100441.mp3
 
-- clip id: attention_outdoors
+- clip id: baby_crying
 - duration: 9360 ms (9.360 s)
-- candidate intervals: 500 ms (0.500 s) to 9360 ms (9.360 s) speech_attention max=1.000
-- candidate timeline: 500 ms (0.500 s):speech_attention(1.000), 1000 ms (1.000 s):speech_attention(1.000), 1500 ms (1.500 s):speech_attention(1.000), 2000 ms (2.000 s):speech_attention(1.000), 2500 ms (2.500 s):speech_attention(0.970), 3000 ms (3.000 s):speech_attention(1.000), 3500 ms (3.500 s):speech_attention(1.000), 4000 ms (4.000 s):speech_attention(1.000), 4500 ms (4.500 s):speech_attention(1.000), 5000 ms (5.000 s):speech_attention(0.975), 5500 ms (5.500 s):speech_attention(0.834), 6000 ms (6.000 s):speech_attention(1.000), 6500 ms (6.500 s):speech_attention(1.000), 7000 ms (7.000 s):speech_attention(0.874), 7500 ms (7.500 s):speech_attention(1.000), 8000 ms (8.000 s):speech_attention(0.913), 8500 ms (8.500 s):speech_attention(0.858), 9000 ms (9.000 s):speech_attention(0.837), 9360 ms (9.360 s):speech_attention(0.912)
-- VAD/speech: Silero loaded=no; sources=fallback; speech intervals=500 ms (0.500 s) to 9360 ms (9.360 s) max=1.000
-- model_call timestamps: 500 ms (0.500 s)
-- model_result outputs: 500 ms (0.500 s):attention_outdoors shouldAlert=True confidence=0.990
-- alert_start timestamps: 500 ms (0.500 s):attention_outdoors_1 attention_outdoors confidence=0.990
-- alert_end timestamps: 9360 ms (9.360 s)
+- trigger timeline: 4000 ms (4.000 s):rms=0.105 peak=0.678 call=True reason=energy_or_onset, 6000 ms (6.000 s):rms=0.079 peak=0.667 call=True reason=energy_or_onset, 8000 ms (8.000 s):rms=0.082 peak=0.667 call=True reason=energy_or_onset, 9360 ms (9.360 s):rms=0.070 peak=0.622 call=True reason=energy_or_onset
+- model_call timestamps: 4000 ms (4.000 s), 6000 ms (6.000 s), 8000 ms (8.000 s), 9360 ms (9.360 s)
+- model_result outputs: 4000 ms (4.000 s):dummy:baby_crying should_alert=True confidence=0.990 language=en, 6000 ms (6.000 s):dummy:baby_crying should_alert=True confidence=0.990 language=en, 8000 ms (8.000 s):dummy:baby_crying should_alert=True confidence=0.990 language=en, 9360 ms (9.360 s):dummy:baby_crying should_alert=True confidence=0.990 language=en
+- model_error outputs: none
+- alert_start timestamps: 4000 ms (4.000 s):baby_crying_1 baby_crying confidence=0.990 language=en
+- alert_end timestamps: none
 - total alerts emitted: 1
-- warnings: Silero VAD unavailable: No module named 'silero_vad'
 - errors: none
 
 ## fire-alarm-414915.mp3
 
 - clip id: fire_alarm
 - duration: 15096 ms (15.096 s)
-- candidate intervals: 500 ms (0.500 s) to 15096 ms (15.096 s) fire_alarm max=1.000
-- candidate timeline: 500 ms (0.500 s):fire_alarm(1.000), 1000 ms (1.000 s):fire_alarm(1.000), 1500 ms (1.500 s):fire_alarm(1.000), 2000 ms (2.000 s):fire_alarm(1.000), 2500 ms (2.500 s):fire_alarm(1.000), 3000 ms (3.000 s):fire_alarm(1.000), 3500 ms (3.500 s):fire_alarm(1.000), 4000 ms (4.000 s):fire_alarm(1.000), 4500 ms (4.500 s):fire_alarm(1.000), 5000 ms (5.000 s):fire_alarm(1.000), 5500 ms (5.500 s):fire_alarm(1.000), 6000 ms (6.000 s):fire_alarm(1.000), 6500 ms (6.500 s):fire_alarm(1.000), 7000 ms (7.000 s):fire_alarm(1.000), 7500 ms (7.500 s):fire_alarm(1.000), 8000 ms (8.000 s):fire_alarm(1.000), 8500 ms (8.500 s):fire_alarm(1.000), 9000 ms (9.000 s):fire_alarm(1.000), 9500 ms (9.500 s):fire_alarm(1.000), 10000 ms (10.000 s):fire_alarm(1.000), 10500 ms (10.500 s):fire_alarm(1.000), 11000 ms (11.000 s):fire_alarm(1.000), 11500 ms (11.500 s):fire_alarm(1.000), 12000 ms (12.000 s):fire_alarm(1.000), 12500 ms (12.500 s):fire_alarm(1.000), 13000 ms (13.000 s):fire_alarm(1.000), 13500 ms (13.500 s):fire_alarm(1.000), 14000 ms (14.000 s):fire_alarm(1.000), 14500 ms (14.500 s):fire_alarm(1.000), 15000 ms (15.000 s):fire_alarm(1.000), 15096 ms (15.096 s):fire_alarm(1.000)
-- VAD/speech: Silero loaded=no; sources=fallback; speech intervals=none
-- model_call timestamps: 500 ms (0.500 s)
-- model_result outputs: 500 ms (0.500 s):fire_alarm shouldAlert=True confidence=0.990
-- alert_start timestamps: 500 ms (0.500 s):fire_alarm_1 fire_alarm confidence=0.990
-- alert_end timestamps: 15096 ms (15.096 s)
+- trigger timeline: 4000 ms (4.000 s):rms=0.072 peak=0.331 call=True reason=energy_or_onset, 6000 ms (6.000 s):rms=0.073 peak=0.351 call=True reason=energy_or_onset, 8000 ms (8.000 s):rms=0.073 peak=0.351 call=True reason=energy_or_onset, 10000 ms (10.000 s):rms=0.073 peak=0.345 call=True reason=energy_or_onset, 12000 ms (12.000 s):rms=0.073 peak=0.345 call=True reason=energy_or_onset, 14000 ms (14.000 s):rms=0.075 peak=0.376 call=True reason=energy_or_onset, 15096 ms (15.096 s):rms=0.082 peak=0.376 call=True reason=energy_or_onset
+- model_call timestamps: 4000 ms (4.000 s), 6000 ms (6.000 s), 8000 ms (8.000 s), 10000 ms (10.000 s), 12000 ms (12.000 s), 14000 ms (14.000 s), 15096 ms (15.096 s)
+- model_result outputs: 4000 ms (4.000 s):dummy:fire_alarm should_alert=True confidence=0.990 language=en, 6000 ms (6.000 s):dummy:fire_alarm should_alert=True confidence=0.990 language=en, 8000 ms (8.000 s):dummy:fire_alarm should_alert=True confidence=0.990 language=en, 10000 ms (10.000 s):dummy:fire_alarm should_alert=True confidence=0.990 language=en, 12000 ms (12.000 s):dummy:fire_alarm should_alert=True confidence=0.990 language=en, 14000 ms (14.000 s):dummy:fire_alarm should_alert=True confidence=0.990 language=en, 15096 ms (15.096 s):dummy:fire_alarm should_alert=True confidence=0.990 language=en
+- model_error outputs: none
+- alert_start timestamps: 4000 ms (4.000 s):fire_alarm_1 fire_alarm confidence=0.990 language=en
+- alert_end timestamps: none
 - total alerts emitted: 1
-- warnings: Silero VAD unavailable: No module named 'silero_vad'
 - errors: none
 
 ## freesound_community-german-ambulance-29046.mp3
 
 - clip id: emergency_vehicle
 - duration: 16536 ms (16.536 s)
-- candidate intervals: 500 ms (0.500 s) to 16536 ms (16.536 s) emergency_vehicle max=1.000
-- candidate timeline: 500 ms (0.500 s):emergency_vehicle(1.000), 1000 ms (1.000 s):emergency_vehicle(1.000), 1500 ms (1.500 s):emergency_vehicle(1.000), 2000 ms (2.000 s):emergency_vehicle(1.000), 2500 ms (2.500 s):emergency_vehicle(1.000), 3000 ms (3.000 s):emergency_vehicle(1.000), 3500 ms (3.500 s):emergency_vehicle(1.000), 4000 ms (4.000 s):emergency_vehicle(1.000), 4500 ms (4.500 s):emergency_vehicle(1.000), 5000 ms (5.000 s):emergency_vehicle(1.000), 5500 ms (5.500 s):emergency_vehicle(1.000), 6000 ms (6.000 s):emergency_vehicle(1.000), 6500 ms (6.500 s):emergency_vehicle(1.000), 7000 ms (7.000 s):emergency_vehicle(1.000), 7500 ms (7.500 s):emergency_vehicle(1.000), 8000 ms (8.000 s):emergency_vehicle(1.000), 8500 ms (8.500 s):emergency_vehicle(1.000), 9000 ms (9.000 s):emergency_vehicle(1.000), 9500 ms (9.500 s):emergency_vehicle(1.000), 10000 ms (10.000 s):emergency_vehicle(1.000), 10500 ms (10.500 s):emergency_vehicle(1.000), 11000 ms (11.000 s):emergency_vehicle(1.000), 11500 ms (11.500 s):emergency_vehicle(1.000), 12000 ms (12.000 s):emergency_vehicle(1.000), 12500 ms (12.500 s):emergency_vehicle(1.000), 13000 ms (13.000 s):emergency_vehicle(1.000), 13500 ms (13.500 s):emergency_vehicle(1.000), 14000 ms (14.000 s):emergency_vehicle(1.000), 14500 ms (14.500 s):emergency_vehicle(1.000), 15000 ms (15.000 s):emergency_vehicle(1.000), 15500 ms (15.500 s):emergency_vehicle(1.000), 16000 ms (16.000 s):emergency_vehicle(1.000), 16500 ms (16.500 s):emergency_vehicle(1.000), 16536 ms (16.536 s):emergency_vehicle(1.000)
-- VAD/speech: Silero loaded=no; sources=fallback; speech intervals=none
-- model_call timestamps: 500 ms (0.500 s)
-- model_result outputs: 500 ms (0.500 s):emergency_vehicle shouldAlert=True confidence=0.990
-- alert_start timestamps: 500 ms (0.500 s):emergency_vehicle_1 emergency_vehicle confidence=0.990
-- alert_end timestamps: 16536 ms (16.536 s)
+- trigger timeline: 4000 ms (4.000 s):rms=0.027 peak=0.126 call=True reason=energy_or_onset, 6000 ms (6.000 s):rms=0.032 peak=0.151 call=True reason=energy_or_onset, 8000 ms (8.000 s):rms=0.057 peak=0.393 call=True reason=energy_or_onset, 10000 ms (10.000 s):rms=0.106 peak=0.614 call=True reason=energy_or_onset, 12000 ms (12.000 s):rms=0.135 peak=0.730 call=True reason=energy_or_onset, 14000 ms (14.000 s):rms=0.138 peak=0.770 call=True reason=energy_or_onset, 16000 ms (16.000 s):rms=0.100 peak=0.770 call=True reason=energy_or_onset, 16536 ms (16.536 s):rms=0.031 peak=0.154 call=True reason=energy_or_onset
+- model_call timestamps: 4000 ms (4.000 s), 6000 ms (6.000 s), 8000 ms (8.000 s), 10000 ms (10.000 s), 12000 ms (12.000 s), 14000 ms (14.000 s), 16000 ms (16.000 s), 16536 ms (16.536 s)
+- model_result outputs: 4000 ms (4.000 s):dummy:emergency_vehicle should_alert=True confidence=0.950 language=en, 6000 ms (6.000 s):dummy:emergency_vehicle should_alert=True confidence=0.950 language=en, 8000 ms (8.000 s):dummy:emergency_vehicle should_alert=True confidence=0.990 language=en, 10000 ms (10.000 s):dummy:emergency_vehicle should_alert=True confidence=0.990 language=en, 12000 ms (12.000 s):dummy:emergency_vehicle should_alert=True confidence=0.990 language=en, 14000 ms (14.000 s):dummy:emergency_vehicle should_alert=True confidence=0.990 language=en, 16000 ms (16.000 s):dummy:emergency_vehicle should_alert=True confidence=0.990 language=en, 16536 ms (16.536 s):dummy:emergency_vehicle should_alert=True confidence=0.950 language=en
+- model_error outputs: none
+- alert_start timestamps: 4000 ms (4.000 s):emergency_vehicle_1 emergency_vehicle confidence=0.950 language=en
+- alert_end timestamps: none
 - total alerts emitted: 1
-- warnings: Silero VAD unavailable: No module named 'silero_vad'
 - errors: none
 
 ## spinopel-ambulance-siren-364900.mp3
 
 - clip id: emergency_vehicle
 - duration: 10971 ms (10.971 s)
-- candidate intervals: 500 ms (0.500 s) to 10971 ms (10.971 s) emergency_vehicle max=1.000
-- candidate timeline: 500 ms (0.500 s):emergency_vehicle(1.000), 1000 ms (1.000 s):emergency_vehicle(1.000), 1500 ms (1.500 s):emergency_vehicle(1.000), 2000 ms (2.000 s):emergency_vehicle(1.000), 2500 ms (2.500 s):emergency_vehicle(1.000), 3000 ms (3.000 s):emergency_vehicle(1.000), 3500 ms (3.500 s):emergency_vehicle(1.000), 4000 ms (4.000 s):emergency_vehicle(1.000), 4500 ms (4.500 s):emergency_vehicle(1.000), 5000 ms (5.000 s):emergency_vehicle(1.000), 5500 ms (5.500 s):emergency_vehicle(1.000), 6000 ms (6.000 s):emergency_vehicle(1.000), 6500 ms (6.500 s):emergency_vehicle(1.000), 7000 ms (7.000 s):emergency_vehicle(1.000), 7500 ms (7.500 s):emergency_vehicle(1.000), 8000 ms (8.000 s):emergency_vehicle(1.000), 8500 ms (8.500 s):emergency_vehicle(1.000), 9000 ms (9.000 s):emergency_vehicle(1.000), 9500 ms (9.500 s):emergency_vehicle(1.000), 10000 ms (10.000 s):emergency_vehicle(1.000), 10500 ms (10.500 s):emergency_vehicle(1.000), 10971 ms (10.971 s):emergency_vehicle(1.000)
-- VAD/speech: Silero loaded=no; sources=fallback; speech intervals=none
-- model_call timestamps: 500 ms (0.500 s)
-- model_result outputs: 500 ms (0.500 s):emergency_vehicle shouldAlert=True confidence=0.990
-- alert_start timestamps: 500 ms (0.500 s):emergency_vehicle_1 emergency_vehicle confidence=0.990
-- alert_end timestamps: 10971 ms (10.971 s)
+- trigger timeline: 4000 ms (4.000 s):rms=0.190 peak=0.825 call=True reason=energy_or_onset, 6000 ms (6.000 s):rms=0.194 peak=0.825 call=True reason=energy_or_onset, 8000 ms (8.000 s):rms=0.191 peak=0.777 call=True reason=energy_or_onset, 10000 ms (10.000 s):rms=0.181 peak=0.830 call=True reason=energy_or_onset, 10971 ms (10.971 s):rms=0.171 peak=0.830 call=True reason=energy_or_onset
+- model_call timestamps: 4000 ms (4.000 s), 6000 ms (6.000 s), 8000 ms (8.000 s), 10000 ms (10.000 s), 10971 ms (10.971 s)
+- model_result outputs: 4000 ms (4.000 s):dummy:emergency_vehicle should_alert=True confidence=0.990 language=en, 6000 ms (6.000 s):dummy:emergency_vehicle should_alert=True confidence=0.990 language=en, 8000 ms (8.000 s):dummy:emergency_vehicle should_alert=True confidence=0.990 language=en, 10000 ms (10.000 s):dummy:emergency_vehicle should_alert=True confidence=0.990 language=en, 10971 ms (10.971 s):dummy:emergency_vehicle should_alert=True confidence=0.990 language=en
+- model_error outputs: none
+- alert_start timestamps: 4000 ms (4.000 s):emergency_vehicle_1 emergency_vehicle confidence=0.990 language=en
+- alert_end timestamps: none
 - total alerts emitted: 1
-- warnings: Silero VAD unavailable: No module named 'silero_vad'
 - errors: none
