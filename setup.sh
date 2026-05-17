@@ -131,6 +131,34 @@ check_required_tools() {
   exit 1
 }
 
+get_hf_token() {
+  local token=""
+
+  if [ -n "${HF_TOKEN:-}" ]; then
+    printf "\n[SoundSight] Using Hugging Face token from HF_TOKEN\n" >&2
+    token="$HF_TOKEN"
+  elif [ -n "${HUGGINGFACE_HUB_TOKEN:-}" ]; then
+    printf "\n[SoundSight] Using Hugging Face token from HUGGINGFACE_HUB_TOKEN\n" >&2
+    token="$HUGGINGFACE_HUB_TOKEN"
+  elif [ -f "$HOME/.cache/huggingface/token" ]; then
+    token="$(tr -d '[:space:]' < "$HOME/.cache/huggingface/token")"
+    if [ -n "$token" ]; then
+      printf "\n[SoundSight] Using Hugging Face token from local Hugging Face cache\n" >&2
+    fi
+  elif [ -f "$HOME/.huggingface/token" ]; then
+    token="$(tr -d '[:space:]' < "$HOME/.huggingface/token")"
+    if [ -n "$token" ]; then
+      printf "\n[SoundSight] Using Hugging Face token from local Hugging Face cache\n" >&2
+    fi
+  elif [ -t 0 ]; then
+    printf "\n[SoundSight] Enter Hugging Face token for faster model download, or press Enter to skip: " >&2
+    read -rs token </dev/tty || true
+    printf "\n" >&2
+  fi
+
+  printf "%s" "$token"
+}
+
 warn_cactus_prerequisites() {
   if [ "$platform" = "macos" ]; then
     if ! xcode-select -p >/dev/null 2>&1; then
@@ -204,7 +232,15 @@ setup_cactus() {
   # shellcheck disable=SC1091
   source ./setup
   cactus build --python
-  cactus download "$CACTUS_MODEL"
+
+  local hf_token
+  hf_token="$(get_hf_token)"
+  if [ -n "$hf_token" ]; then
+    cactus download "$CACTUS_MODEL" --token "$hf_token"
+  else
+    warn "No Hugging Face token provided; continuing without token (download may be slower or fail for gated models)."
+    cactus download "$CACTUS_MODEL"
+  fi
 }
 
 detect_platform

@@ -18,6 +18,15 @@ chmod +x setup.sh run.sh
 
 Then open **http://localhost:3000**
 
+> **Optional — Hugging Face token:** Setting `HF_TOKEN` before running `setup.sh` speeds up the model download and is required for gated models. The token is only passed to `cactus download` and is never stored by SoundSight.
+>
+> ```bash
+> export HF_TOKEN=hf_xxx
+> ./setup.sh
+> ```
+>
+> If `HF_TOKEN` is not set, `setup.sh` also checks `HUGGINGFACE_HUB_TOKEN` and your local Hugging Face cache (`~/.cache/huggingface/token`), then prompts you interactively. You can skip the prompt to proceed without a token.
+
 ---
 
 ### Windows
