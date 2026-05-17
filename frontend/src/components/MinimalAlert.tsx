@@ -13,13 +13,11 @@ import {
   getLocalizedAlertCopy,
   iconByImageKey,
   type IconKey,
-  type LanguageCode,
   type StreamAlert,
 } from "@/lib/demo-alerts";
 
 type MinimalAlertProps = {
   alert: StreamAlert;
-  language: LanguageCode;
 };
 
 const iconMap: Record<IconKey, LucideIcon> = {
@@ -31,8 +29,8 @@ const iconMap: Record<IconKey, LucideIcon> = {
   baby: Baby,
 };
 
-export function MinimalAlert({ alert, language }: MinimalAlertProps) {
-  const copy = getLocalizedAlertCopy(alert, language);
+export function MinimalAlert({ alert }: MinimalAlertProps) {
+  const copy = getLocalizedAlertCopy(alert);
   const image = alertImagesByKey[alert.image_key];
   const iconKey = iconByImageKey[alert.image_key] ?? "speech";
   const FallbackIcon = iconMap[iconKey];

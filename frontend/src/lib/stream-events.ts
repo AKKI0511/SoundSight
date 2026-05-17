@@ -19,8 +19,9 @@ type LiveWindowEventsOptions = {
 };
 
 const API_BASE_URL =
-  process.env.NEXT_PUBLIC_SOUNDSIGHT_API_URL ?? "http://localhost:8000";
-const BACKEND_CONNECT_TIMEOUT_MS = 1200;
+  process.env.NEXT_PUBLIC_SOUNDSIGHT_API_URL ?? "http://127.0.0.1:8000";
+const BACKEND_CONNECT_TIMEOUT_MS = 10_000;
+const FIRST_STREAM_CHUNK_TIMEOUT_MS = 2_500;
 
 export async function streamDemoEvents(
   options: DemoStreamEventsOptions,
@@ -108,15 +109,21 @@ async function readNdjsonResponse(
   const reader = response.body.getReader();
   const decoder = new TextDecoder();
   let buffer = "";
+  let didReadChunk = false;
 
   try {
     while (true) {
-      const { done, value } = await reader.read();
+      const readResult = didReadChunk
+        ? await reader.read()
+        : await readFirstChunk(reader);
+
+      const { done, value } = readResult;
 
       if (done) {
         break;
       }
 
+      didReadChunk = true;
       buffer += decoder.decode(value, { stream: true });
       const lines = buffer.split("\n");
       buffer = lines.pop() ?? "";
@@ -128,8 +135,39 @@ async function readNdjsonResponse(
 
     buffer += decoder.decode();
     emitNdjsonLine(buffer, onEvent);
+  } catch (error) {
+    try {
+      await reader.cancel();
+    } catch {
+      // The stream may already be closed by the browser or server.
+    }
+    throw error;
   } finally {
     reader.releaseLock();
+  }
+}
+
+async function readFirstChunk(
+  reader: ReadableStreamDefaultReader<Uint8Array>,
+): Promise<ReadableStreamReadResult<Uint8Array>> {
+  let timeoutId: number | undefined;
+
+  try {
+    const readResult = await Promise.race([
+      reader.read(),
+      new Promise<never>((_, reject) => {
+        timeoutId = window.setTimeout(
+          () => reject(new BackendUnavailableError()),
+          FIRST_STREAM_CHUNK_TIMEOUT_MS,
+        );
+      }),
+    ]);
+
+    return readResult;
+  } finally {
+    if (timeoutId !== undefined) {
+      window.clearTimeout(timeoutId);
+    }
   }
 }
 

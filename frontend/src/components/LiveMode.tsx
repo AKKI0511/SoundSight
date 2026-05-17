@@ -63,7 +63,7 @@ export function LiveMode() {
         const sequence = alertSequenceRef.current;
         alertSequenceRef.current += 1;
         setActiveAlerts((alerts) => [
-          ...alerts.filter((alert) => alert.key !== key),
+          ...alerts.filter((alert) => alert.sessionId !== event.sessionId),
           {
             key,
             eventId: event.eventId,
@@ -140,9 +140,8 @@ export function LiveMode() {
       }
 
       const chunks: BlobPart[] = [];
-      const windowIndex = windowIndexRef.current + 1;
-      windowIndexRef.current = windowIndex;
-      const sessionId = `${sessionBaseRef.current}_${windowIndex}`;
+      windowIndexRef.current += 1;
+      const sessionId = sessionBaseRef.current;
       let timeoutId: number | null = null;
 
       recorder.ondataavailable = (event) => {
@@ -289,7 +288,7 @@ export function LiveMode() {
 
       <section className="flex min-h-0 w-full flex-1 items-center justify-center">
         {visibleAlert ? (
-          <MinimalAlert alert={visibleAlert} language={language} />
+          <MinimalAlert alert={visibleAlert} />
         ) : null}
       </section>
 

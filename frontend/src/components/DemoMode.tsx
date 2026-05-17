@@ -17,6 +17,14 @@ import {
 } from "@/lib/alert-events";
 import { streamDemoEvents } from "@/lib/stream-events";
 
+type DemoPlaybackStatus =
+  | "idle"
+  | "starting_audio"
+  | "playing"
+  | "audio_blocked"
+  | "audio_unavailable"
+  | "backend_unavailable";
+
 export function DemoMode() {
   const audioRef = useRef<HTMLAudioElement>(null);
   const streamControllerRef = useRef<AbortController | null>(null);
@@ -28,6 +36,8 @@ export function DemoMode() {
     demoClips[0]?.id ?? "",
   );
   const [isPlaying, setIsPlaying] = useState(false);
+  const [playbackStatus, setPlaybackStatus] =
+    useState<DemoPlaybackStatus>("idle");
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [activeAlerts, setActiveAlerts] = useState<ActiveAlert[]>([]);
@@ -43,6 +53,7 @@ export function DemoMode() {
   );
 
   const progress = duration > 0 ? currentTime / duration : 0;
+  const statusLabel = demoStatusLabel(playbackStatus);
 
   const applyStreamEvent = useCallback((event: StreamEvent) => {
     switch (event.type) {
@@ -55,7 +66,7 @@ export function DemoMode() {
         const sequence = alertSequenceRef.current;
         alertSequenceRef.current += 1;
         setActiveAlerts((alerts) => [
-          ...alerts.filter((alert) => alert.key !== key),
+          ...alerts.filter((alert) => alert.sessionId !== event.sessionId),
           {
             key,
             eventId: event.eventId,
@@ -74,7 +85,6 @@ export function DemoMode() {
         break;
       }
       case "session_done":
-        setActiveAlerts([]);
         break;
     }
   }, []);
@@ -95,6 +105,7 @@ export function DemoMode() {
 
     setCurrentTime(0);
     setIsPlaying(false);
+    setPlaybackStatus("idle");
   }, []);
 
   const startClip = useCallback(
@@ -104,15 +115,18 @@ export function DemoMode() {
       }
 
       streamControllerRef.current?.abort();
+      streamControllerRef.current = null;
       alertSequenceRef.current = 0;
       setActiveAlerts([]);
       setSelectedClipId(clip.id);
       setCurrentTime(0);
       setDuration(0);
+      setPlaybackStatus("starting_audio");
 
       const audio = audioRef.current;
 
       if (!audio) {
+        setPlaybackStatus("audio_unavailable");
         return;
       }
 
@@ -134,32 +148,31 @@ export function DemoMode() {
         // Some browsers reject seeking until metadata exists for a new source.
       }
 
-      const controller = new AbortController();
       const runId = streamRunRef.current + 1;
       streamRunRef.current = runId;
-      streamControllerRef.current = controller;
 
       try {
         await audio.play();
       } catch {
-        if (
-          streamRunRef.current === runId &&
-          !controller.signal.aborted
-        ) {
-          controller.abort();
-          streamControllerRef.current = null;
-          setCurrentTime(0);
+        if (streamRunRef.current === runId) {
+          setActiveAlerts([]);
           setIsPlaying(false);
+          setPlaybackStatus("audio_blocked");
         }
-
         return;
       }
 
-      if (streamRunRef.current !== runId || controller.signal.aborted) {
+      if (streamRunRef.current !== runId || audio.paused) {
+        if (streamRunRef.current === runId) {
+          setPlaybackStatus("audio_blocked");
+        }
         return;
       }
 
+      const controller = new AbortController();
+      streamControllerRef.current = controller;
       setIsPlaying(true);
+      setPlaybackStatus("playing");
 
       void streamDemoEvents({
         clipId: clip.id,
@@ -177,11 +190,30 @@ export function DemoMode() {
         .catch((error: unknown) => {
           if (!controller.signal.aborted) {
             console.warn("SoundSight stream ended unexpectedly", error);
+            if (streamRunRef.current === runId) {
+              streamControllerRef.current = null;
+              audio.pause();
+              try {
+                audio.currentTime = 0;
+              } catch {
+                // Some browsers reject seeking while media state is changing.
+              }
+              setCurrentTime(0);
+              setIsPlaying(false);
+              setActiveAlerts([]);
+              setPlaybackStatus("backend_unavailable");
+            }
           }
         })
         .finally(() => {
           if (streamRunRef.current === runId) {
             streamControllerRef.current = null;
+            if (audio.paused) {
+              setIsPlaying(false);
+              setPlaybackStatus((status) =>
+                status === "playing" ? "idle" : status,
+              );
+            }
           }
         });
     },
@@ -238,7 +270,21 @@ export function DemoMode() {
           }
         }}
         onPlay={() => setIsPlaying(true)}
-        onPause={() => setIsPlaying(false)}
+        onPause={() => {
+          setIsPlaying(false);
+          if (streamControllerRef.current && !audioRef.current?.ended) {
+            streamControllerRef.current.abort();
+            streamControllerRef.current = null;
+            setPlaybackStatus("idle");
+          }
+        }}
+        onError={() => {
+          streamControllerRef.current?.abort();
+          streamControllerRef.current = null;
+          setActiveAlerts([]);
+          setIsPlaying(false);
+          setPlaybackStatus("audio_unavailable");
+        }}
         onEnded={() => {
           stopAndReset();
         }}
@@ -273,11 +319,29 @@ export function DemoMode() {
 
           <PhoneEmulator
             alert={visibleAlert}
-            language={language}
             isPlaying={isPlaying}
+            statusLabel={statusLabel}
           />
         </section>
       </div>
     </main>
   );
+}
+
+function demoStatusLabel(status: DemoPlaybackStatus): string {
+  switch (status) {
+    case "starting_audio":
+      return "starting audio";
+    case "playing":
+      return "listening";
+    case "audio_blocked":
+      return "audio blocked";
+    case "audio_unavailable":
+      return "audio unavailable";
+    case "backend_unavailable":
+      return "backend unavailable";
+    case "idle":
+    default:
+      return "ready";
+  }
 }

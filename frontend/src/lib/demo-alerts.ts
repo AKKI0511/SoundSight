@@ -10,30 +10,19 @@ export type IconKey =
   | "speech"
   | "baby";
 
-export type AlertTranslation = {
-  alert_text: string;
-  action: string;
-};
-
 export type StreamAlert = {
   sound_type: string;
   tier: AlertTier;
   image_key: string;
   alert_text: string;
   action: string;
-  translations: Record<Exclude<LanguageCode, "en">, AlertTranslation>;
   haptic: string;
   confidence: number;
+  language: LanguageCode;
 };
 
-export type StreamAnalysis = {
-  detectedSoundType: string;
-  tier: AlertTier;
-  alertText: string;
-  action: string;
-  confidence: number;
-  shouldAlert: boolean;
-  alert: StreamAlert;
+export type StreamAnalysis = StreamAlert & {
+  should_alert: boolean;
 };
 
 export type StreamEvent =
@@ -227,21 +216,9 @@ export const demoClips: DemoClip[] = [
   },
 ];
 
-export function getLocalizedAlertCopy(
-  alert: StreamAlert,
-  language: LanguageCode,
-): LocalizedAlertCopy {
-  if (language === "en") {
-    return {
-      alertText: alert.alert_text,
-      actionText: alert.action,
-    };
-  }
-
-  const translation = alert.translations[language];
-
+export function getLocalizedAlertCopy(alert: StreamAlert): LocalizedAlertCopy {
   return {
-    alertText: translation?.alert_text ?? alert.alert_text,
-    actionText: translation?.action ?? alert.action,
+    alertText: alert.alert_text,
+    actionText: alert.action,
   };
 }
