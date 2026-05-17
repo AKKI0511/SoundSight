@@ -125,7 +125,7 @@ def _complete_with_cactus(prompt: str, audio_path: Path) -> str:
         {
             "max_tokens": 256,
             "temperature": 0.0,
-            "stop_sequences": ["```", "<|im_end|>"],
+            "stop_sequences": ["```", "<|im_end|>", "<end_of_turn>"],
         }
     )
 
@@ -227,21 +227,31 @@ def _write_candidate_wav(audio_window: object) -> Path:
 
 def _build_prompt(metadata: dict[str, Any], language: LanguageCode) -> str:
     metadata_json = json.dumps(metadata, ensure_ascii=True, sort_keys=True)
-    return f"""You are SoundSight, an accessibility assistant for Deaf and hard-of-hearing users. Analyze the attached audio directly with Gemma 4. Do not transcribe first. Return only one valid compact JSON object and no markdown.
+    return f"""You are SoundSight, an accessibility assistant for Deaf and hard-of-hearing users.
 
-Required JSON shape:
+Task: classify the attached audio window. Detect only important real-world sound cues. Do not describe background noise. Return exactly one compact JSON object. No markdown.
+
+Language: {language}
+
+Allowed sound_type:
+emergency_vehicle, fire_alarm, door_knock, attention_outdoors, addressing_user, baby_crying, background_noise, unknown
+
+Allowed tier:
+emergency, social, ambient, none
+
+Return this JSON shape only:
 {{"should_alert":true,"sound_type":"fire_alarm","tier":"emergency","alert_text":"Fire alarm detected.","action":"Move to safety now.","image_key":"fire_alarm","haptic":"SOS vibration","confidence":0.91,"language":"{language}"}}
 
-Allowed sound_type values: emergency_vehicle, fire_alarm, door_knock, attention_outdoors, addressing_user, baby_crying, background_noise, unknown.
-Allowed tier values: emergency, social, ambient, none.
 Rules:
-- Use only the requested UI language for alert_text and action.
-- Set language exactly to "{language}".
-- Return selected-language fields only; do not include other language fields.
-- If uncertain or only background noise, set should_alert=false, sound_type="unknown" or "background_noise", tier="none", haptic="None", confidence <= 0.30.
+- alert_text and action must be only in {language}.
+- Do not include translations or extra keys.
+- If no clear target event is present, return:
+{{"should_alert":false,"sound_type":"background_noise","tier":"none","alert_text":"","action":"","image_key":"unknown","haptic":"None","confidence":0.2,"language":"{language}"}}
+- If uncertain, should_alert=false.
 - alert_text max 12 words.
 - action max 8 words.
-- Use image_key matching sound_type when possible.
+- image_key must match sound_type when possible.
+- confidence must be 0.0 to 1.0.
 
 Detector metadata: {metadata_json}
 """
